@@ -537,8 +537,12 @@ jQuery(document).ready(function() {
    	   var params="order_id="+ $(this).data("id")+"&post_type=get";
    	   params+="&lang="+lang;
        fancyBoxFront('viewReceipt',params);
-   });	
+   });
    
+	$( document ).on( "click", ".view-chat-box", function() {		
+	  $(".chatbot").toggle();
+	});
+
    /*COOKIE LAW*/
    if ( $(".cookie-wrap").exists() ){   	   
    	   $.cookie.raw = true;

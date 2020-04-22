@@ -1,7 +1,28 @@
 
 <?php if ( Yii::app()->functions->hasMerchantAccess("DashBoard")):?>
 
-
+    <!-- <div class="uk-child-width-1-2@s uk-grid-collapse uk-text-center" uk-grid>
+    <div>
+        <div class="uk-tile uk-tile-default uk-padding-small">
+            <p class="uk-h4">Default</p>
+        </div>
+    </div>
+    <div>
+        <div class="uk-tile uk-tile-muted uk-padding-small">
+            <p class="uk-h4">Muted</p>
+        </div>
+    </div>
+    <div>
+        <div class="uk-tile uk-tile-primary uk-padding-small">
+            <p class="uk-h4">Primary</p>
+        </div>
+    </div>
+    <div>
+        <div class="uk-tile uk-tile-secondary uk-padding-small">
+            <p class="uk-h4">Secondary</p>
+        </div>
+    </div>
+</div> -->
 
 <form id="frm_table_list" method="POST" class="report uk-form uk-form-horizontal merchant-dashboard" >
 <h3><?php echo Yii::t("default","New Order List For Today")?> 

@@ -18,7 +18,7 @@ class AjaxController extends CController
 	public function beforeAction($action)
 	{
 		$action_name= $action->id ;				
-		if($action_name!="login"){
+		if($action_name!="login" || $action_name!="DriverChat"){
 			if(!Driver::islogin()){
 				 Yii::app()->end();
 			}
@@ -62,7 +62,28 @@ class AjaxController extends CController
 	{
 	  echo json_encode($feed_data);
 	  die();
-    }    
+	}    
+	
+	public function actionDriverChat(){
+        var_dump($this->data);
+        $db=new DbExt;
+        $param_to_insert=array(
+            'order_id'=>$this->data['order_id'],
+            'sender_userid'=>$this->data['driver_id'],
+            'reciever_userid'=>$this->data['client_id'],
+            'merchant_id'=>$this->data['merchant_id'],
+            'driver_id'=>$this->data['driver_id'],
+            'client_id'=>$this->data['client_id'],
+            'message'=>$this->data['message'],
+            'status'=>1
+        );
+        if ( $db->insertData("{{chat}}",$param_to_insert)) {
+            $this->details = Yii::app()->db->getLastInsertID();
+            $this->code = 1;
+            $this->msg = Yii::t("default", "okay");
+            return;
+        }
+    }
     
 	public function actionLogin()
 	{		

@@ -2620,6 +2620,12 @@ function callAjax(action,params,button)
 	 	 	 	  alert(js_lang.trans_49);
 	 	 	 	break;
 	 	 	 	
+	 	 	 	//details driver report and details
+				 case "chartReports":
+					 $(".report_div").html(data.details.charts);
+					 $(".table_charts").html(data.details.table);
+					 break;
+	 	 	 	
 	 	 	 	default:
 	 	 	 	uk_msg_sucess(data.msg);
 	 	 	 	break;
@@ -3387,3 +3393,70 @@ jQuery(document).ready(function() {
 	});
 });
 /*end ready*/
+
+
+
+/*for driver chat and reports*/
+
+if ( $(".report_div").exists() ){
+	loadChart();
+}
+
+$( document ).on( "change", "#team_selection", function() {
+	team_id=$(this).val();
+	$("#driver_selection").val("all");
+	$("#driver_selection .team_opion").hide();
+	$("#driver_selection .option_"+team_id).show();
+});
+
+$( document ).on( "click", ".view_charts", function() {
+	report_type=$(this).data("id");
+	$("#chart_type").val(report_type);
+	loadChart();
+});
+
+$( document ).on( "change", "#time_selection", function() {
+	if ( $(this).val()=="custom" ){
+		$(".custom_selection").show();
+		//$("#time_selection").hide();
+	} else {
+		$(".custom_selection").hide();
+		//$("#time_selection").show();
+		loadChart();
+	}
+});
+
+$( document ).on( "change", "#team_selection,#driver_selection", function() {
+	loadChart();
+});
+
+$( document ).on( "click", ".change_charts", function() {
+	$("#chart_type_option").val( $(this).data("id") );
+	loadChart();
+});
+
+function loadChart()
+{
+	params="chart_type="+$("#chart_type").val();
+	params+='&chart_type_option='+ $("#chart_type_option").val();
+	params+='&time_selection='+ $("#time_selection").val();
+	params+='&team_selection='+ $("#team_selection").val();
+	params+='&driver_selection='+ $("#driver_selection").val();
+	params+='&start_date='+ $("#start_date").val();
+	params+='&end_date='+ $("#end_date").val();
+	$(".table_charts").html('');
+	callAjax("chartReports", params );
+}
+
+/*if ( $('.datetimepicker1').exists() ){
+	dump('datetimepicker1 exists');
+	$('.datetimepicker1').datetimepicker({
+		timepicker:false,
+		format:'Y-m-d',
+		onChangeDateTime:function(dp,$input){
+			if ( $("#start_date").val()!="" && $("#end_date").val()!="" ){
+				loadChart();
+			}
+		}
+	});
+}*/

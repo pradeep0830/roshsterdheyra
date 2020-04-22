@@ -7899,7 +7899,8 @@ class FunctionsV3
 		$list[]='getCartCount';		
 		$list[]='updateReview';
 		$list[]='merchantPayment';
-		$list[]='setAddress';
+		$list[]='setAddress';	
+		$list[]='storeChat';
 				
 		return $list;
 	}

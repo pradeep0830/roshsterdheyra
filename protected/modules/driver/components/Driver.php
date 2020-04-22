@@ -546,7 +546,7 @@ class Driver
 		LIMIT 0,1
 		";*/
 		$stmt="
-		SELECT d.*,o.otp FROM
+		SELECT d.*,o.otp,o.client_id FROM
 		{{driver_task_view}} d
 		left join {{order}} o
         ON

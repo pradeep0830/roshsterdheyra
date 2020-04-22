@@ -13,6 +13,7 @@
 <div class="clear"></div>
 
 
+
 <form id="frm_table_list" method="POST" class="report uk-form uk-form-horizontal" >
 <h3><?php echo Yii::t("default","New Merchant Registration List For Today")?> <span class="uk-text-success">
 <?php

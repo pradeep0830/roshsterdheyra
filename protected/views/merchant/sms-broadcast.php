@@ -25,7 +25,7 @@ echo CHtml::hiddenField('total_customer_by_merchant',$total_customer_by_merchant
 
 <h2><?php echo Yii::t("default","Send SMS Offers to customer by sending Bulk SMS")?></h2>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Send to All Customer")?></label>
   <?php 
   echo CHtml::radioButton('send_to',
@@ -37,7 +37,7 @@ echo CHtml::hiddenField('total_customer_by_merchant',$total_customer_by_merchant
 <?php echo Yii::t("default","This options will send SMS to all available clients on the database");?>
 </p>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Send to Customer Who already buy your products")?></label>
   <?php 
   echo CHtml::radioButton('send_to',
@@ -47,7 +47,7 @@ echo CHtml::hiddenField('total_customer_by_merchant',$total_customer_by_merchant
 </div>
 <p class="uk-text-muted"><?php echo Yii::t("default","This options will send SMS to all customer who already purchase your product.")?></p>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Send to specific mobile numbers")?></label>
   <?php 
   echo CHtml::radioButton('send_to',
@@ -63,18 +63,18 @@ echo CHtml::hiddenField('total_customer_by_merchant',$total_customer_by_merchant
   <label class="uk-form-label"><?php echo Yii::t("default","List of mobile number")?></label>
   <?php 
   echo CHtml::textArea('list_mobile_number','',array(
-    'class'=>"uk-form-width-large",
+    'class'=>"uk-form-width-large uk-input",
     'style'=>"height:150px",
     //"data-validation"=>"required"
   ))
   ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","SMS Message")?></label>
   <?php 
   echo CHtml::textArea('sms_alert_message','',array(
-    'class'=>"uk-form-width-large",
+    'class'=>"uk-form-width-large uk-input",
     'style'=>"height:150px",
     "data-validation"=>"required"
   ))
@@ -83,9 +83,9 @@ echo CHtml::hiddenField('total_customer_by_merchant',$total_customer_by_merchant
 <p style="text-indent:200px;"><?php echo Yii::t("default","SMS")?> (<span id="maxlength">160</span> <?php echo Yii::t("default","characters left")?>)</p>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Send SMS")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Send SMS")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

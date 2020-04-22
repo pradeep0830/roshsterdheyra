@@ -363,7 +363,7 @@ class ApiController extends CController
     			$res['trans_type']=self::t($res['trans_type']);  
     			$res['merchant_name']=stripslashes($res['merchant_name']);
     			$res['merchant_address']=stripslashes($res['merchant_address']);
-    			
+    			$res['s_client_id']=$res['client_id'];
     			$res['history']=Driver::getDriverTaskHistory($this->data['task_id']);
     			
     			if($res['merchant_id']>=1){    				

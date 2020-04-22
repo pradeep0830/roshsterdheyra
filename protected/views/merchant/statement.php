@@ -48,7 +48,7 @@ if ( !isset($_GET['payment_type'])){
 
 <form id="frm_table_list" method="GET" class="report uk-form uk-form-horizontal" >
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Start Date")?></label>
   
   
@@ -56,26 +56,26 @@ if ( !isset($_GET['payment_type'])){
   echo CHtml::hiddenField('start_date',isset($_GET['start_date'])?$_GET['start_date']:'' );
   echo CHtml::textField('start_date1',isset($_GET['start_date1'])?$_GET['start_date1']:'' 
   ,array(
-  'class'=>'uk-form-width-large j_date',
+  'class'=>'uk-form-width-large j_date uk-input',
   'data-id'=>'start_date'
   ))?>
   
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","End Date")?></label>
   
   <?php 
   echo CHtml::hiddenField('end_date',isset($_GET['end_date'])?$_GET['end_date']:'' );
   echo CHtml::textField('end_date1',isset($_GET['end_date1'])?$_GET['end_date1']:'' 
   ,array(
-  'class'=>'uk-form-width-large j_date',
+  'class'=>'uk-form-width-large j_date uk-input',
   'data-id'=>'end_date'
   ))?>
 </div>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Payment Type")?></label>
   <?php 
   echo CHtml::dropDownList('payment_type',
@@ -86,17 +86,17 @@ if ( !isset($_GET['payment_type'])){
     3=>t("Card")
   ),
   array(
-    'class'=>"uk-form-width-large"
+    'class'=>"uk-form-width-large uk-select"
   ));
   ?>
 </div>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label">&nbsp;</label>
   <!--<input type="button" class="uk-button uk-form-width-medium uk-button-success" value="Search" onclick="sales_summary_reload();">  -->
-  <input type="submit" class="uk-button uk-form-width-medium uk-button-success" value="<?php echo t("Search")?>" >  
-  <a href="javascript:;" rel="rptmerchantstatement" class="export_btn uk-button"><?php echo t("Export")?></a>
+  <input type="submit" class="uk-button uk-form-width-medium uk-button-primary" value="<?php echo t("Search")?>" >  
+  <a href="javascript:;" rel="rptmerchantstatement" class="export_btn uk-button uk-button-default"><?php echo t("Export")?></a>
 </div>  
 
 <div style="height:20px;"></div>

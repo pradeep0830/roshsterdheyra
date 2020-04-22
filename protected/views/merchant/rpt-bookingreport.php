@@ -4,32 +4,32 @@
 $order_stats=Yii::app()->functions->orderStatusList(false);    
 ?>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Start Date")?></label>
   <?php echo CHtml::hiddenField('start_date',isset($_GET['start_date'])?$_GET['start_date']:'')?>
   <?php echo CHtml::textField('start_date1',
   isset($_GET['start_date'])?FormatDateTime($_GET['start_date'],false):''
   ,array(
-  'class'=>'uk-form-width-large j_date' ,
+  'class'=>'uk-form-width-large j_date uk-input' ,
   'data-id'=>'start_date',
   ))?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","End Date")?></label>
   <?php echo CHtml::hiddenField('end_date',isset($_GET['end_date'])?$_GET['end_date']:'')?>
   <?php echo CHtml::textField('end_date1',
   isset($_GET['end_date'])?FormatDateTime($_GET['end_date'],false):''
   ,array(
-  'class'=>'uk-form-width-large j_date',
+  'class'=>'uk-form-width-large j_date uk-input',
   'data-id'=>'end_date',
   ))?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label">&nbsp;</label>
-  <input type="submit" class="uk-button uk-form-width-medium uk-button-success" value="<?php echo t("Search")?>" >  
-  <a href="javascript:;" rel="booking-summary-report" class="export_btn uk-button"><?php echo Yii::t("default","Export")?></a>
+  <input type="submit" class="uk-button uk-form-width-medium uk-button-primary" value="<?php echo t("Search")?>" >  
+  <a href="javascript:;" rel="booking-summary-report" class="export_btn uk-button uk-button-default"><?php echo Yii::t("default","Export")?></a>
 </div>  
 
 <div style="height:20px;"></div>

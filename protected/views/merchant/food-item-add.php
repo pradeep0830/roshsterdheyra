@@ -66,29 +66,29 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	<div class="spacer"></div>
 
     <?php else :?>
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	<label class="uk-form-label"><?php echo Yii::t("default","Food Item Name")?></label>
 	<?php echo CHtml::textField('item_name',
 	isset($data['item_name'])?$data['item_name']:""
 	,array(
-	'class'=>'uk-form-width-large',
+	'class'=>'uk-form-width-large uk-input',
 	'data-validation'=>"required"
 	))?>
 	</div>
 
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	<label class="uk-form-label"><?php echo Yii::t("default","Description")?></label>
 	<?php echo CHtml::textArea('item_description',
 	isset($data['item_description'])?$data['item_description']:""
 	,array(
-	'class'=>'uk-form-width-large big-textarea'	
+	'class'=>'uk-form-width-large big-textarea uk-input'	
 	))?>
 	</div>
 	
 	<?php endif;?>
 	
 	
-    <div class="uk-form-row">
+    <div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo Yii::t("default","Two Flavors")?></label>  
 	  <div class="clear"></div>
 	  <ul class="uk-list uk-list-striped">
@@ -100,7 +100,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 		  echo CHtml::checkBox('two_flavors',
 		  $data['two_flavors']==2?true:false
 		  ,array(
-		    'class'=>"two_flavors",
+		    'class'=>"two_flavors ",
 		    'value'=>2
 		  ))
 	     ?>
@@ -147,7 +147,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	      </div>
 	      <div class="uk-width-1-3">
 	      <?php echo CHtml::dropDownList("multi_option[$addonid][]",$selected_item_array[0],(array)Yii::app()->functions->multiOptions(),array(
-	        'class'=>"multi_option",
+	        'class'=>"multi_option uk-select",
 	        'data-id'=>$addonid
 	      ) )?>
 	      </div>
@@ -164,7 +164,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	         'left'=>t("left"),
 	         'right'=>t("Right")
 	       ),array(
-	        'class'=>'two_flavors_position',
+	        'class'=>'two_flavors_position uk-select',
 	        'data-id'=>$addonid
 	       ))?>
 	      </div>
@@ -177,14 +177,14 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	   <?php echo CHtml::checkBox("require_addon[$addonid][]",
 	   in_array(2,$selected_require_addon)?true:false
 	   ,array(
-	     'class'=>"require_addon",
+	     'class'=>"require_addon uk-checkbox",
 	     'value'=>2
 	   ))?>	   
 	   &nbsp;&nbsp;
 	   <?php echo t("Check all/uncheck");?>
 	   <?php 
          echo CHtml::checkBox('check_all',false,array( 
-           'class'=>"check_all",
+           'class'=>"check_all uk-checkbox",
            'value'=>$addonid
          ));
         ?>
@@ -225,13 +225,13 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
     
     <div class="uk-width-1-2">
     
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	<label class="uk-form-label"><?php echo Yii::t("default","Status")?></label>
 	<?php echo CHtml::dropDownList('status',
 	isset($data['status'])?$data['status']:"",
 	(array)statusList(),          
 	array(
-	'class'=>'uk-form-width-medium',
+	'class'=>'uk-form-width-medium uk-select',
 	'data-validation'=>"required"
 	))?>
 	</div>
@@ -241,10 +241,10 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 <!--FEATURED IMAGE-->
 
 
-<div class="uk-form-row"> 
+<div class="uk-form-row uk-margin"> 
   <label class="uk-form-label"><?php echo t("Featured Image")?></label>
 <button id="sau_merchant_upload_file" 
-   class="button uk-button" data-progress="sau_merchant_progress" data-preview="image_preview" data-field="photo">Choose File</button>
+   class=" uk-button uk-button-default" data-progress="sau_merchant_progress" data-preview="image_preview" data-field="photo">Choose File</button>
   <!--<a href="javascript:;" id="sau_merchant_upload_file" 
    class="button uk-button" data-progress="sau_merchant_progress" data-preview="image_preview" data-field="photo">
     <?php //echo t("Browse")?>
@@ -271,10 +271,10 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 
 
 <!--GALLERY -->
-<div class="uk-form-row"> 
+<div class="uk-form-row uk-margin"> 
   <label class="uk-form-label"><?php echo t("Gallery Image")?></label>
   <a href="javascript:;" id="multiple_upload" 
-   class="button uk-button" data-progress="multiple_upload_progress" data-preview="image_multiple_preview" data-field="gallery_photo">
+   class="uk-button uk-button-default" data-progress="multiple_upload_progress" data-preview="image_multiple_preview" data-field="gallery_photo">
     <?php echo t("Browse")?>
   </a>
 </div>
@@ -309,7 +309,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	Yii::app()->functions->data='list';
 	$category_list=Yii::app()->functions->getCategoryList(Yii::app()->functions->getMerchantID());		
 	?>
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo Yii::t("default","Food Category")?></label>  
 	  <div class="clear"></div>
 	  <?php if (is_array($category_list) && count($category_list)>=1):?>
@@ -318,7 +318,8 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	    <li>
 	    <?php echo CHtml::checkBox('category[]',
 	    in_array($key,(array)$category)?true:false,array(
-	      'value'=>$key,
+		  'value'=>$key,
+		  'class'=>"uk-checkbox",
 	      'data-validation'=>"checkbox_group",
 	      'data-validation-qty'=>'min1'
 	    ))?>
@@ -371,11 +372,11 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 		    <?php if ($merchant_apply_tax==1):?>
 		  
 		     <div class="uk-width-1-3">
-		    <?php echo CHtml::dropDownList('size[]',$price_key,$size_list,array('class'=>"uk-form-width-medium"))?>
+		    <?php echo CHtml::dropDownList('size[]',$price_key,$size_list,array('class'=>"uk-form-width-medium uk-select"))?>
 		     </div>
 		     <div class="uk-width-1-4">
 		      <?php echo CHtml::textField('price[]',$val_price,
-		      array('class'=>'uk-form-width-medium numeric_only food_price'))?>
+		      array('class'=>'uk-form-width-medium numeric_only food_price uk-input'))?>
 		    </div>
 		    
 		    <div class="uk-width-1-4">
@@ -391,11 +392,11 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 		    <?php else:?>
 		    
 		     <div class="uk-width-1-3">
-		    <?php echo CHtml::dropDownList('size[]',$price_key,$size_list,array('class'=>"uk-form-width-medium"))?>
+		    <?php echo CHtml::dropDownList('size[]',$price_key,$size_list,array('class'=>"uk-form-width-medium uk-select"))?>
 		     </div>
 		     <div class="uk-width-1-3">
 		      <?php echo CHtml::textField('price[]',$val_price,
-		      array('class'=>'uk-form-width-medium numeric_only'))?>
+		      array('class'=>'uk-form-width-medium numeric_only uk-input'))?>
 		    </div>
 		    		
 		    <div class="uk-width-1-3">
@@ -415,11 +416,11 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	    <?php if ($merchant_apply_tax==1):?>
 	    
 	        <div class="uk-width-1-3">
-		    <?php echo CHtml::dropDownList('size[]','',$size_list,array('class'=>"uk-form-width-medium"))?>
+		    <?php echo CHtml::dropDownList('size[]','',$size_list,array('class'=>"uk-form-width-medium uk-select"))?>
 		     </div>
 		     <div class="uk-width-1-4">
 		      <?php echo CHtml::textField('price[]','',
-		      array('class'=>'uk-form-width-medium numeric_only food_price'))?>
+		      array('class'=>'uk-form-width-medium numeric_only food_price uk-input'))?>
 		    </div>
 		    
 		    <div class="uk-width-1-4">
@@ -432,11 +433,11 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	    
 	    <?php else :?>
 		     <div class="uk-width-1-3">
-		    <?php echo CHtml::dropDownList('size[]','',$size_list,array('class'=>"uk-form-width-medium"))?>
+		    <?php echo CHtml::dropDownList('size[]','',$size_list,array('class'=>"uk-form-width-medium uk-select"))?>
 		     </div>
 		     <div class="uk-width-1-3">
 		      <?php echo CHtml::textField('price[]','',
-		      array('class'=>'uk-form-width-medium numeric_only'))?>
+		      array('class'=>'uk-form-width-medium numeric_only uk-input'))?>
 		    </div>
 		    <div class="uk-width-1-3">
 		    <a href="javascript:;" class="removeprice"><i class="fa fa-minus-square"></i></a>
@@ -456,19 +457,19 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	<p class="uk-text-danger"><?php echo Yii::t("default","Please add different size in order to add price.")?></p>
 	<?php endif;?>
 	
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	<label class="uk-form-label"><?php echo Yii::t("default","Discount (numeric value)")?></label>
 	<?php echo CHtml::textField('discount',
 	isset($data['discount'])?$data['discount']:""
 	,array(
-	'class'=>'uk-form-width-medium numeric_only'	
+	'class'=>'uk-form-width-medium numeric_only uk-input'	
 	))?>
 	</div>
 		
 	<?php 
 	$cooking_ref=Yii::app()->functions->getCookingRefList(Yii::app()->functions->getMerchantID());	
 	?>
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo Yii::t("default","Cooking Reference")?></label>  
 	  <div class="clear"></div>
 	  <?php if (is_array($cooking_ref) && count($cooking_ref)>=1):?>
@@ -477,7 +478,8 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	    <li>
 	    <?php echo CHtml::checkBox('cooking_ref[]',
 	    in_array($key,(array)$cooking_ref_selected)?true:false,array(
-	      'value'=>$key
+			'value'=>$key,
+			'class'=>"uk-checkbox",
 	    ))?>
 	    <?php echo ($val);?>
 	    </li>
@@ -491,7 +493,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	$ingredients=Yii::app()->functions->getIngredientsList(Yii::app()->functions->getMerchantID());	
 	?>
 	<?php if (is_array($ingredients) && count($ingredients)>=1):?>
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo Yii::t("default","Ingredients")?></label>  
 	  <div class="clear"></div>
 	  <?php if (is_array($ingredients) && count($ingredients)>=1):?>
@@ -500,7 +502,8 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	    <li>
 	    <?php echo CHtml::checkBox('ingredients[]',
 	    in_array($key,(array)$ingredients_selected)?true:false,array(
-	      'value'=>$key
+		  'value'=>$key,
+		  'class'=>"uk-checkbox",
 	    ))?>
 	    <?php echo ($val);?>
 	    </li>
@@ -529,7 +532,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
    <?php $dish=Yii::app()->functions->GetDishList();?>
    <?php $dish_selected=isset($data['dish'])?json_decode($data['dish'],true):'';?>
    <?php if (is_array($dish) && count($dish)>=1):?>
-	  <div class="uk-form-row">
+	  <div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo Yii::t("default","Dish")?></label>  
 	  <div class="clear"></div>
 	  <ul class="uk-list uk-list-striped">
@@ -550,7 +553,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	</div>
 	<?php endif;?>
 	
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo t("Tax")?></label>  
 	<div class="clear"></div>
 		
@@ -564,7 +567,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	  echo CHtml::checkBox('non_taxable',
 	  $data['non_taxable']==2?true:false
 	  ,array(
-	   'class'=>"icheck",
+	   'class'=>"icheck uk-checkbox",
 	   'value'=>2
 	  ))?>	  	  	  
 	  <?php echo t("Non taxable")?>
@@ -575,7 +578,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	
 	<!--POINTS PROGRAM-->
 	<?php if (FunctionsV3::hasModuleAddon("pointsprogram")):?>
-	<div class="uk-form-row">
+	<div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo t("Points earned")?></label>  
 	<div class="clear"></div>		
 	  <ul class="uk-list uk-list-striped">	  	  
@@ -587,7 +590,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	  echo CHtml::textField('points_earned',
 	  $data['points_earned']>0?$data['points_earned']:''
 	  ,array(
-	    'class'=>"numeric_only"
+	    'class'=>"numeric_only uk-input"
 	  ))?>
 	  </li>
 	  
@@ -599,7 +602,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	  echo CHtml::checkBox('points_disabled',
 	  $data['points_disabled']==2?true:false
 	  ,array(
-	   'class'=>"icheck",
+	   'class'=>"icheck uk-checkbox",
 	   'value'=>2
 	  ))?>	  	  	  
 	  <?php echo t("Disabled Points on this item")?>
@@ -612,7 +615,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	
 	<div class="packaging_wrap">
 	
-	 <div class="uk-form-row">
+	 <div class="uk-form-row uk-margin">
 	  <label class="uk-form-label uk-h3"><?php echo t("Packaging Wise")?></label>  
 	  <div class="clear"></div>
 	  
@@ -627,7 +630,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	  $data['packaging_fee']>0?normalPrettyPrice($data['packaging_fee']):''
 	  ,array(
 	    'placeholder'=>t("Packaging fee"),
-	    'class'=>"numeric_only"
+	    'class'=>"numeric_only uk-input"
 	  ));
 	  ?>
 	  </li>
@@ -639,7 +642,7 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 	   echo CHtml::checkBox('packaging_incremental',
 	  $data['packaging_incremental']==1?true:false
 	  ,array(
-	   'class'=>"icheck",
+	   'class'=>"icheck uk-checkbox",
 	   'value'=>1
 	  ));
 	  echo "&nbsp;".t("Packaging Incremental");
@@ -657,9 +660,9 @@ echo CHtml::hiddenField('merchant_tax',$merchant_tax);
 <div class="spacer"></div>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

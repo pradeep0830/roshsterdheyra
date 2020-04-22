@@ -3,11 +3,22 @@ $yii_session_token=session_id();
 $csrfTokenName = Yii::app()->request->csrfTokenName;
 $csrfToken = Yii::app()->request->csrfToken;
 $cancel_order_enabled = getOptionA('cancel_order_enabled');
+//dump($_SESSION);die();
 ?>
+
 <div class="box-grey rounded section-order-history" style="margin-top:0;">
 
 <div class="bottom10">
-<?php echo FunctionsV3::sectionHeader('Your Recent Order');?>
+<?php echo FunctionsV3::sectionHeader('Your Recent Order'); 
+function searchForId($sts, $reshs) {
+  foreach ($reshs as $key => $val) {
+      if ($val['status'] === $sts) {
+          return $val['driver_id'];
+      }
+  }
+  return null;
+}
+?>
 </div>
 <?php if (is_array($data) && count($data)>=1):?>
 
@@ -86,6 +97,7 @@ $cancel_order_enabled = getOptionA('cancel_order_enabled');
         </td>
         
         <td>
+
           <a href="javascript:;" class="view-order-history" data-id="<?php echo $val['order_id'];?>">
           <p class="green-text top10 "><?php echo t($val['status'])?></p>                    
           </a>
@@ -109,11 +121,36 @@ $cancel_order_enabled = getOptionA('cancel_order_enabled');
               </div>              
             <?php endif;?>
             <!--end recurring html part-->
+
         </td>
+          <?php if ( $reshs=FunctionsK::orderHistory($val['order_id'])):             
+            ?>
+              <?php if(searchForId("acknowledged",$reshs)):?>
+                  <td>
+                      <!--start chat functions-->
+                      <a href="<?php echo Yii::app()->createUrl('store/chat-driver',array(
+                          'token'=>$_SESSION['kr_client']['token'],
+                          'name'=>$_SESSION['kr_client']['first_name']." ".$_SESSION['kr_client']['last_name'],
+                          'contact_phone'=>$_SESSION['kr_client']['contact_phone'],
+                          'order_token'=>$val['order_id_token'],
+                          'order_id'=>$val['order_id'],
+                          'merchant_id'=>$val['merchant_id'],
+                          'client_id'=>$val['client_id'],
+                          'otp'=>$val['otp'],
+                          'delivery_date'=>$val['delivery_date'],
+                          'driver_id'=>searchForId("acknowledged",$reshs)
+                      ))?>" class="btn black-button btn-sm">
+                          <i class="fa fa-comments fa-lg sbn" aria-hidden="true"></i> live chat
+                      </a>
+                      <!--end chat functions-->
+                  </td>
+              <?php endif;?>
+          <?php endif;  ?>
+
       </tr>      
             
       <tr class="order-order-history show-history-<?php echo $val['order_id']?>"> 
-        <td colspan="5">
+        <td colspan="6">
          <?php if ( $resh=FunctionsK::orderHistory($val['order_id'])):?>     
          <table class="table table-striped" >
            <thead>

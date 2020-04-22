@@ -4462,4 +4462,55 @@ class StoreController extends CController
 		
 	/*START CUSTOM CODE*/
 	
+	public function actionChatDriver(){
+        $order_id=$_REQUEST['order_id'];
+        $merchant_id=$_REQUEST['merchant_id'];
+        $client_id=$_REQUEST['client_id'];
+        $driver_id=$_REQUEST['driver_id'];
+		$delivery_date=$_REQUEST['delivery_date'];
+		$res=null;
+        $db_ext=new DbExt;
+        $stmt="SELECT *
+		FROM
+		{{chat}}
+		WHERE		
+		order_id=".$order_id."
+		AND
+		sender_userid = ".FunctionsV3::q($client_id)."
+		AND
+		reciever_userid =".$driver_id."
+		OR
+		sender_userid = ".$driver_id." AND reciever_userid =".FunctionsV3::q($client_id)."
+		
+		ORDER BY timestamp ASC
+		";
+		$get_driver="SELECT 
+		user_id as driver_id,CONCAT(CONCAT(first_name, ' '), last_name) AS driver_full_name, phone as driver_phone, profile_photo as driver_profile_photo
+		FROM
+		{{driver}}
+		WHERE
+		driver_id=".FunctionsV3::q($driver_id)."
+		Limit 1
+		";
+		if($db_ext->rst($get_driver)):
+			$driver_data=$db_ext->rst($get_driver);
+		else:
+			die("no driver data");
+		endif;       
+        if ($db_ext->rst($stmt)){
+			$res=$db_ext->rst($stmt);
+						
+		}
+        /* $this->render(chat-front,array('data'=>$chat_data));*/
+        $cs = Yii::app()->getClientScript();
+        $baseUrl = Yii::app()->baseUrl;
+        $cs->registerScriptFile($baseUrl."/assets/js/scrolbar.js",CClientScript::POS_END);
+        $cs->registerScriptFile($baseUrl."/assets/js/chat.js",CClientScript::POS_END);
+        if (Yii::app()->functions->isClientLogin()){
+            $this->render('chat-front',array('data'=>$res,'drv_data'=>$driver_data));
+        } else $this->render('404-page',array(
+            'header'=>true
+        ));
+    }
+	
 } /*END CLASS*/

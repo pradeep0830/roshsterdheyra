@@ -168,9 +168,9 @@ echo CHtml::hiddenField('mobile_country_code',Yii::app()->functions->getAdminCou
 		  </DIV>-->		  
           
           <div class="center top10">
-             <a href="javascript:;" id="single_uploadfile" data-progress="single_uploadfile_progress" data-preview="avatar-wrap" >
-               <?php echo t("Browse")?>
-             </a>          
+            <a href="javascript:;" id="single_uploadfile" data-progress="single_uploadfile_progress" data-preview="avatar-wrap" >
+              <?php echo t("Browse")?>
+            </a>          
           </div>
           
           <div class="single_uploadfile_progress"></div>
@@ -222,8 +222,68 @@ echo CHtml::hiddenField('mobile_country_code',Yii::app()->functions->getAdminCou
           <?php endif;?>
        
        </div>
-    </div> <!--col-->
+
+       <div class="chatbot " style="display:none">
+          <div class="">
+              <div class="panel">
+                <!--Heading-->
+                <div class="panel-heading">
+                  <div class="panel-control">
+                    <div class="btn-group">
+                      <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#demo-chat-body"><i class="fa fa-chevron-down"></i></button>
+                      <button type="button" class="btn btn-default" data-toggle="dropdown"><i class="fa fa-gear"></i></button>
+                      <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="#">Available</a></li>
+                        <li><a href="#">Busy</a></li>
+                        <li><a href="#">Away</a></li>
+                        <li class="divider"></li>
+                        <li><a id="demo-connect-chat" href="#" class="disabled-link" data-target="#demo-chat-body">Connect</a></li>
+                        <li><a id="demo-disconnect-chat" href="#" data-target="#demo-chat-body">Disconect</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                  <h3 class="panel-title">Chat</h3>
+                </div>
+          
+                <!--Widget body-->
+                <div id="demo-chat-body" class="collapse in">
+                  <div class="nano has-scrollbar" style="height:380px">
+                    <div class="nano-content pad-all" tabindex="0" style="right: -17px;">
+                      <ul class="list-unstyled media-block messages">
+                        
+                      </ul>
+                    </div>
+                  <div class="nano-pane"><div class="nano-slider" style="height: 141px; transform: translate(0px, 0px);"></div></div></div>
+            
+                  <!--Widget footer-->
+                  <div class="panel-footer">
+                    <div class="row">
+                    <div class="bottom_wrapper clearfix">
+                      <div class="message_input_wrapper">
+                          <input class="message_input" placeholder="Type your message here..." />
+                      </div>
+                      <div class="send_message">
+                          <div class="icon"></div>
+                          <div class="text">Send</div>
+                      </div>
+                  </div>
+                  <div class="message_template">
+                      <li class="message">
+                          <div class="avatar"></div>
+                          <div class="text_wrapper">
+                              <div class="text"></div>
+                          </div>
+                      </li>
+                  </div>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div> <!--col-->
     
-  </div> <!--row-->
+    </div> <!--row-->
   </div> <!--container-->  
 </div> <!--sections-->

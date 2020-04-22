@@ -7,18 +7,18 @@
 <?php echo CHtml::hiddenField('action','shipppingRates')?>
 <?php echo CHtml::hiddenField('id',isset($_GET['id'])?$_GET['id']:"");?>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Free delivery above Sub Total Order")?></label>
   <?php
   echo CHtml::textField('free_delivery_above_price',
   Yii::app()->functions->getOption("free_delivery_above_price",$mtid)
-  ,array('class'=>"numeric_only"));  
+  ,array('class'=>"numeric_only uk-input"));  
   ?>
   <span style="padding-left:8px;"><?php echo adminCurrencySymbol();?></span>
 </div>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Enabled Table Rates")?>?</label>
   <?php
   echo CHtml::checkBox('shipping_enabled',
@@ -56,25 +56,27 @@
    <td class="shipping-col-1">
    <?php echo CHtml::textField('distance_from[]',$val['distance_from'],
      array(
-       'class'=>"numeric_only distance_from",
+       'class'=>"numeric_only distance_from uk-input",
        "placeholder"=>t("From")
      ))?>
    <?php echo t("To")?>
    <?php echo CHtml::textField('distance_to[]',$val['distance_to'],
      array(
-       'class'=>"numeric_only",
+       'class'=>"numeric_only uk-input",
        "placeholder"=>t("To")
      ))?>
    </td>
    
    <td class="shipping-col-2">
-   <?php echo CHtml::dropDownList('shipping_units[]',$val['shipping_units'],Yii::app()->functions->distanceOption())?>
+   <?php echo CHtml::dropDownList('shipping_units[]',$val['shipping_units'],Yii::app()->functions->distanceOption(),array(
+        'class'=>'uk-select',
+        ))?>
    </td>
    
    <td class="shipping-col-3">
    <?php echo CHtml::textField('distance_price[]',
    standardPrettyFormat($val['distance_price'])
-   ,array('class'=>"numeric_only"))?>
+   ,array('class'=>"numeric_only uk-input"))?>
    </td>
       
    <!--<td class="shipping-col-2">
@@ -108,7 +110,9 @@
      ))?>
   </td>
   <td class="shipping-col-2">
-    <?php echo CHtml::dropDownList('shipping_units[]','',Yii::app()->functions->distanceOption())?>
+    <?php echo CHtml::dropDownList('shipping_units[]','',Yii::app()->functions->distanceOption(),array(
+        'class'=>'uk-select',
+        ))?>
   </td>
   <td class="shipping-col-3">
     <?php echo CHtml::textField('distance_price[]','',array('class'=>"numeric_only"))?>
@@ -126,15 +130,15 @@
 </tbody>
 
 </table>
-<a class="uk-button add-table-rate" href="javascript:;">+ <?php echo t("Add Table Rate")?></a>
+<a class="uk-button uk-button-default add-table-rate" href="javascript:;">+ <?php echo t("Add Table Rate")?></a>
 </div>
 
 
 <div class="spacer"></div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

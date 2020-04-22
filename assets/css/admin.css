@@ -84,9 +84,12 @@ position:relative !important;
 }
 
 .header_wrap{
+position:sticky;
 background:#FFFFFF;
 border-bottom:1px solid #EEEEEE;
 height:52px;
+top:0px;
+z-index: 10;
 }
 
 .header_wrap .left, .main_wrapper .left_panel{
@@ -118,6 +121,7 @@ height:52px;
 .main_wrapper{
 position:relative;
 height:100%;
+
 }
 
 .main_wrapper .left_panel{
@@ -125,9 +129,9 @@ height:100%;
 color:#8F939E;
 height:95vh;
 /*min-height:1200px;*/
-position: relative;
+position: fixed;
 z-index:2;
-background-image: linear-gradient(to right, rgba(1, 2, 2, 0.91), rgb(157, 159, 163));
+background-image: linear-gradient(to right, rgba(1, 2, 2, 0.91), rgb(113, 114, 116));
 }
 
 .main_content{
@@ -239,7 +243,8 @@ background:#FFFFFF;
 }
 
 .menu i{
-width:20px;
+    width: 36px;
+    color: #797d82;
 }
 
 .preloader{

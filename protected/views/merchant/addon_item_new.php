@@ -45,33 +45,33 @@ Widgets::multipleFields(array(
 <div class="spacer"></div>
 
 <?php else :?>
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","AddOn Item")?></label>
   <?php echo CHtml::textField('sub_item_name',
   isset($data['sub_item_name'])?$data['sub_item_name']:""
   ,array(
-  'class'=>'uk-form-width-large',
+  'class'=>'uk-form-width-large uk-input',
   'data-validation'=>"required"
   ))?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Description")?></label>
   <?php echo CHtml::textField('item_description',
   isset($data['item_description'])?$data['item_description']:""
   ,array(
-  'class'=>'uk-form-width-large'  
+  'class'=>'uk-form-width-large uk-input'  
   ))?>
 </div>
 <?php endif;?>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Status")?></label>
   <?php echo CHtml::dropDownList('status',
   isset($data['status'])?$data['status']:"",
   (array)statusList(),          
   array(
-  'class'=>'uk-form-width-large',
+  'class'=>'uk-form-width-large uk-select',
   'data-validation'=>"required"
   ))?>
 </div>
@@ -80,7 +80,7 @@ Widgets::multipleFields(array(
 
 <div class="uk-width-1-2">
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","AddOn Category")?></label>  
   <div class="clear"></div>
   <?php if (is_array($subcat) && count($subcat)>=1):?>
@@ -89,7 +89,8 @@ Widgets::multipleFields(array(
     <li>
     <?php echo CHtml::checkBox('category[]',
     in_array($key,(array)$selected_cat)?true:false,array(
-      'value'=>$key,     
+      'value'=>$key,  
+      'class'=>"icheck",   
        'data-validation'=>"checkbox_group",
 	   'data-validation-qty'=>'min1'
     ))?>
@@ -100,17 +101,17 @@ Widgets::multipleFields(array(
   <?php endif;?>
 </div>
 
-<div class="uk-form-row">
-  <label class="uk-form-label"><?php echo Yii::t("default","Price")?></label>
+<div class="uk-form-row uk-margin">
+  <label class="uk-form-label "><?php echo Yii::t("default","Price")?></label>
   <?php
   echo CHtml::textField('price',isset($data['price'])?$data['price']:"",array(
-   'class'=>"numeric_only addon_price"
+   'class'=>"numeric_only addon_price uk-input"
   ))
   ?>  
 </div>
 
 <?php if ($merchant_apply_tax==1):?>
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Total Price with tax")?></label>
   <span class="total_addon_with_tax">
   <?php 
@@ -125,10 +126,10 @@ Widgets::multipleFields(array(
 
 
 
-<div class="uk-form-row"> 
+<div class="uk-form-row uk-margin"> 
   <label class="uk-form-label"><?php echo t("Featured Image")?></label>
   <a href="javascript:;" id="sau_merchant_upload_file" 
-   class="button uk-button" data-progress="sau_merchant_progress" data-preview="image_preview" data-field="photo">
+   class=" uk-button uk-button-default" data-progress="sau_merchant_progress" data-preview="image_preview" data-field="photo">
     <?php echo t("Browse")?>
   </a>
 </div>
@@ -156,9 +157,9 @@ Widgets::multipleFields(array(
 
 <div class="spacer"></div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary ">
 </div>
 
 </form>

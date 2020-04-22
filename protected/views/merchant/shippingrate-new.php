@@ -6,18 +6,18 @@
 <form class="uk-form uk-form-horizontal forms" id="forms">
 <?php echo CHtml::hiddenField('action','deliveryTableRate')?>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Free delivery above Sub Total Order")?></label>
   <?php
   echo CHtml::textField('free_delivery_above_price',
   Yii::app()->functions->getOption("free_delivery_above_price",$mtid)
-  ,array('class'=>"numeric_only"));  
+  ,array('class'=>"numeric_only uk-input"));  
   ?>
   <span style="padding-left:8px;"><?php echo adminCurrencySymbol();?></span>
 </div>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Enabled Table Rates")?>?</label>
   <?php
   echo CHtml::checkBox('shipping_enabled',
@@ -55,7 +55,7 @@
       <div class="col">
          <?php echo CHtml::textField('from[]',
          isset($data_val['distance_from'])?$data_val['distance_from']:''
-         ,array('class'=>'numeric_only',
+         ,array('class'=>'numeric_only uk-input',
          'style'=>'width:80px;',
          'placeholder'=>t("from")
          ))?>
@@ -63,7 +63,7 @@
       <div class="col">
          <?php echo CHtml::textField('to[]',
          isset($data_val['distance_to'])?$data_val['distance_to']:''
-         ,array('class'=>'numeric_only',
+         ,array('class'=>'numeric_only uk-input',
           'style'=>'width:80px;',
           'placeholder'=>t("to")
          ))?>
@@ -73,6 +73,7 @@
        <?php echo CHtml::dropDownList('unit[]',
        isset($data_val['unit'])?$data_val['unit']:''
        ,Yii::app()->functions->distanceOption(),array(
+        'class'=>'uk-select',
          'style'=>'width:80px;',
        ))?>
       </div>
@@ -85,8 +86,8 @@
    <th>
     <?php echo CHtml::textField("fee[$val[id]][]",
     normalPrettyPrice($data_val[ $val['id']."_fee" ])
-    ,array(
-      'class'=>'numeric_only',
+    ,array( 
+      'class'=>'numeric_only uk-input',
       'style'=>"width:80px;",
       'placeholder'=>t("fee")
     ))?>
@@ -108,7 +109,7 @@
       <div class="col">
          <?php echo CHtml::textField('from[]',
          ''
-         ,array('class'=>'numeric_only',
+         ,array('class'=>'numeric_only uk-input',
          'style'=>'width:80px;',
          'placeholder'=>t("from")
          ))?>
@@ -116,7 +117,7 @@
       <div class="col">
          <?php echo CHtml::textField('to[]',
          ''
-         ,array('class'=>'numeric_only',
+         ,array('class'=>'numeric_only uk-input',
           'style'=>'width:80px;',
           'placeholder'=>t("to")
          ))?>
@@ -126,6 +127,7 @@
        <?php echo CHtml::dropDownList('unit[]',
        ''
        ,Yii::app()->functions->distanceOption(),array(
+         'class'=>'uk-select',
          'style'=>'width:80px;',
        ))?>
       </div>
@@ -139,7 +141,7 @@
     <?php echo CHtml::textField("fee[$val[id]][]",
      ''
     ,array(
-      'class'=>'numeric_only',
+      'class'=>'numeric_only uk-input',
       'style'=>"width:80px;",
       'placeholder'=>t("fee")
     ))?>
@@ -164,9 +166,9 @@
 
 <div class="spacer"></div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

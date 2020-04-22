@@ -37,32 +37,32 @@ Widgets::multipleFields(array(
 
 <?php else :?>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","ingredients name")?></label>
   <?php echo CHtml::textField('ingredients_name',
   isset($data['ingredients_name'])?$data['ingredients_name']:""
   ,array(
-  'class'=>'uk-form-width-large',
+  'class'=>'uk-form-width-large uk-input',
   'data-validation'=>"required"
   ))?>
 </div>
 <?php endif;?>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin ">
   <label class="uk-form-label"><?php echo Yii::t("default","Status")?></label>
   <?php echo CHtml::dropDownList('status',
   isset($data['status'])?$data['status']:"",
   (array)statusList(),          
   array(
-  'class'=>'uk-form-width-large',
+  'class'=>'uk-form-width-large uk-select',
   'data-validation'=>"required"
   ))?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

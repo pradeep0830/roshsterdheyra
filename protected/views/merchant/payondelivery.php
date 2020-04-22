@@ -13,7 +13,7 @@ if (!empty($list_check)){
 <?php echo CHtml::hiddenField('action','payOnDeliveryMerchant')?>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Enabled")?>?</label>
   <?php 
   echo CHtml::checkBox('merchant_payondeliver_enabled',
@@ -27,10 +27,13 @@ if (!empty($list_check)){
 
 
 
-<div class="uk-form-row payment-provider-list">
+<div class="uk-form-row uk-margin payment-provider-list">
   <label class="uk-form-label"><?php echo Yii::t("default","Mode")?></label>
+<div class="clear"></div>
   <?php if (is_array($list) && count($list)>=1):?>
+<ul class="uk-list uk-list-striped">
   <?php foreach ($list as $val):?>
+<li>
   <?php 
   echo CHtml::checkBox('payment_provider[]',
   in_array($val['id'],(array)$list_check)?true:false
@@ -38,15 +41,19 @@ if (!empty($list_check)){
   echo "<span>".ucwords($val['payment_name'])."</span>";
   echo "<img src=\"".uploadURL()."/".$val['payment_logo']."\" >";  
   ?>
+
+   <?php echo $val;?>
+</li>
   <?php endforeach;?>
+</ul>
   <?php endif;?>
 </div>
 
 <div class="spacer"></div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button  uk-button-primary">
 </div>
 
 </form>

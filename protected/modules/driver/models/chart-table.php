@@ -7,7 +7,7 @@ if (!isset($new_data)){
 $total_ordered=0;
 ?>
 
-<table class="table top30 table-hover table-striped">
+<table class="table top30 table-hover table-striped uk-table uk-table-striped">
  <thead>
   <tr>
    <th class="text-muted"><?php echo Driver::t("Date")?></th>

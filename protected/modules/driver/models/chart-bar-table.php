@@ -6,7 +6,7 @@ if (!isset($new_data_1)){
 //dump($new_data_1);
 ?>
 
-<table class="table top30 table-hover table-striped">
+<table class="table top30 table-hover table-striped uk-table">
  <thead>
   <tr>
    <th class="text-muted"><?php echo Driver::t("Name")?></th>

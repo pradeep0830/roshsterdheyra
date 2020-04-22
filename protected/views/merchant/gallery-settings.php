@@ -10,13 +10,13 @@ $gallery_disabled=Yii::app()->functions->getOption("gallery_disabled",$merchant_
 <?php echo CHtml::hiddenField('action','gallerySettings')?>
 
 
-<div class="uk-form-row"> 
+<div class="uk-form-row uk-margin"> 
  <label class="uk-form-label"><?php echo Yii::t('default',"Disabled Gallery")?>?</label>
  <?php 
  echo CHtml::checkBox('gallery_disabled',
  $gallery_disabled=="yes"?true:false
  ,array(
-   'class'=>'icheck',
+   'class'=>'icheck uk-checkbox',
    'value'=>"yes"
  ));
  ?>
@@ -24,10 +24,10 @@ $gallery_disabled=Yii::app()->functions->getOption("gallery_disabled",$merchant_
 
 
 <!--GALLERY -->
-<div class="uk-form-row"> 
+<div class="uk-form-row uk-margin"> 
   <label class="uk-form-label"><?php echo t("Gallery Image")?></label>
   <a href="javascript:;" id="multiple_upload" 
-   class="button uk-button" data-progress="multiple_upload_progress" data-preview="image_multiple_preview" data-field="photo">
+   class="uk-button uk-button-default" data-progress="multiple_upload_progress" data-preview="image_multiple_preview" data-field="photo">
     <?php echo t("Browse")?>
   </a>
 </div>
@@ -58,9 +58,9 @@ $gallery_disabled=Yii::app()->functions->getOption("gallery_disabled",$merchant_
 
 <div class="spacer"></div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

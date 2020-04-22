@@ -4,7 +4,7 @@
 <form class="uk-form uk-form-horizontal forms" id="forms">
 <?php echo CHtml::hiddenField('action','minTableRates')?>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Enabled Table")?>?</label>
   <?php
   echo CHtml::checkBox('min_tables_enabled',
@@ -41,25 +41,25 @@
 	  <td class="shipping-col-1">
 	   <?php echo CHtml::textField('distance_from[]',$val['distance_from'],
 	     array(
-	       'class'=>"numeric_only distance_from",
+	       'class'=>"numeric_only distance_from uk-input",
 	       "placeholder"=>t("From")
 	     ))?>
 	   <?php echo t("To")?>
 	   <?php echo CHtml::textField('distance_to[]',$val['distance_to'],
 	     array(
-	       'class'=>"numeric_only",
+	       'class'=>"numeric_only uk-input",
 	       "placeholder"=>t("To")
 	     ))?>
 	   </td>
 	
 	  <td class="shipping-col-2">
-	  <?php echo CHtml::dropDownList('shipping_units[]',$val['shipping_units'],Yii::app()->functions->distanceOption())?>
+	  <?php echo CHtml::dropDownList('shipping_units[]',$val['shipping_units'],Yii::app()->functions->distanceOption(),array('class'=>"uk-select"))?>
 	  </td>
 	  
 	  <td class="shipping-col-3">
 	  <?php echo CHtml::textField('min_order[]',
 	  $val['min_order']>=0.001?standardPrettyFormat($val['min_order']):''
-	   ,array('class'=>"numeric_only"))?>
+	   ,array('class'=>"numeric_only uk-input"))?>
 	  </td>
 	    
 	  <td>
@@ -80,25 +80,25 @@
   <td class="shipping-col-1">
    <?php echo CHtml::textField('distance_from[]','',
      array(
-       'class'=>"numeric_only distance_from",
+       'class'=>"numeric_only distance_from uk-input",
        "placeholder"=>t("From")
      ))?>
    <?php echo t("To")?>
    <?php echo CHtml::textField('distance_to[]','',
      array(
-       'class'=>"numeric_only",
+       'class'=>"numeric_only uk-input",
        "placeholder"=>t("To")
      ))?>
    </td>
 
   <td class="shipping-col-2">
-  <?php echo CHtml::dropDownList('shipping_units[]','',Yii::app()->functions->distanceOption())?>
+  <?php echo CHtml::dropDownList('shipping_units[]','',Yii::app()->functions->distanceOption(),array('class'=>"uk-select"))?>
   </td>
   
   <td class="shipping-col-3">
   <?php echo CHtml::textField('min_order[]',
    ''
-   ,array('class'=>"numeric_only"))?>
+   ,array('class'=>"numeric_only uk-input"))?>
   </td>
     
   <td></td>
@@ -113,9 +113,9 @@
 
 <div class="spacer"></div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

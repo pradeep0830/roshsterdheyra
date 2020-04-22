@@ -25,45 +25,49 @@ if (isset($_GET['id'])){
 }
 ?>                                 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Offer Percentage")?></label>
+  <div class="clear"></div>
+
   <?php echo CHtml::textField('offer_percentage',
   isset($data['offer_percentage'])?number_format($data['offer_percentage'],0):""
   ,array(
-  'class'=>'numeric_only',
+  'class'=>'numeric_only uk-input',
   'data-validation'=>"required"
   ))?> %
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Orders Over")?></label>
+  <div class="clear"></div>
+
   <?php echo CHtml::textField('offer_price',
   isset($data['offer_price'])?standardPrettyFormat($data['offer_price']):""
   ,array(
-  'class'=>'numeric_only',
+  'class'=>'numeric_only uk-input',
   'data-validation'=>"required"
   ))?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Valid From")?></label>
   <?php echo CHtml::hiddenField('valid_from',isset($data['valid_from'])?$data['valid_from']:"")?>
   <?php echo CHtml::textField('valid_from2',
   isset($data['valid_from'])?$data['valid_from']:""
   ,array(
-  'class'=>'j_date',
+  'class'=>'j_date uk-input',
   'data-validation'=>"required",
   'data-id'=>"valid_from"
   ))?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Valid To")?></label>
   <?php echo CHtml::hiddenField('valid_to',isset($data['valid_to'])?$data['valid_to']:"")?>
   <?php echo CHtml::textField('valid_to2',
   isset($data['valid_to'])?$data['valid_to']:""
   ,array(
-  'class'=>'j_date',
+  'class'=>'j_date uk-input',
   'data-validation'=>"required",
   'data-id'=>"valid_to"
   ))?>
@@ -76,7 +80,7 @@ if (isset($data['applicable_to'])){
 	//dump($applicable_to);
 }
 ?>
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo t("Applicable to")?></label>
   <?php 
   echo CHtml::checkBox('applicable_to[]',
@@ -95,25 +99,27 @@ if (isset($data['applicable_to'])){
   
   echo CHtml::checkBox('applicable_to[]',
   in_array('dinein',(array)$applicable_to)?true:false
-  ,array('value'=>'dinein'));
+  ,array('class'=>"uk-checkbox",'value'=>'dinein'));
   echo "&nbsp;".t("Dinein");
   ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Status")?></label>
+  <div class="clear"></div>
+
   <?php echo CHtml::dropDownList('status',
   isset($data['status'])?$data['status']:"",
   (array)statusList(),          
   array(
-  'class'=>'',
+  'class'=>'uk-select',
   'data-validation'=>"required"
   ))?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

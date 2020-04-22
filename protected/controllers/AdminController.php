@@ -909,7 +909,63 @@ class AdminController extends CController
     public function actionDriverReview(){
         $this->crumbsTitle=t("Driver Reviews");
         $this->render('driver-review');
+	}
+	
+	public function actionDriverReports(){
+		// dump($_SESSION);
+		// die();
+        $cs = Yii::app()->getClientScript();
+        $cs->registerScriptFile('//amcharts.com/lib/3/amcharts.js', CClientScript::POS_END);
+        $cs->registerScriptFile('//amcharts.com/lib/3/serial.js', CClientScript::POS_END);
+        $cs->registerScriptFile('//amcharts.com/lib/3/themes/light.js', CClientScript::POS_END);
+        $cs->registerScriptFile('../protected/modules/driver/assets/driver.js', CClientScript::POS_END);
+        $cs->registerScriptFile('../protected/modules/driver/assets/moment.js', CClientScript::POS_END);
+        $cs->registerScriptFile('../protected/modules/driver/assets/datetimepicker/jquery.datetimepicker.full.min.js', CClientScript::POS_END);
+
+        $mt_id=Yii::app()->functions->getAdminId();
+        $user_type=$_SESSION['kr_merchant_user_type'];
+        $team_list=Driver::teamList($user_type,$mt_id);
+        dump($team_list);die();
+        if($team_list){
+            $team_list=Driver::toList($team_list,'team_id','team_name',
+                Driver::t("All Team")
+            );
+        }
+        $all_driver=Driver::getAllDriver(
+            $user_type,$mt_id
+        );
+        //dump($team_list);die();
+        $start= date('Y-m-d', strtotime("-7 day") );
+        $end=date("Y-m-d", strtotime("+1 day"));
+
+        $this->render('driver-reports',array(
+            'team_list'=>$team_list,
+            'all_driver'=>$all_driver,
+            'start_date'=>$start,
+            'end_date'=>$end
+        ));
+
+	}
+	public function actionDriverTeam(){
+        $this->crumbsTitle=Yii::t("default","Teams");
+        $this->render('drivers-teams');
     }
+
+    public function actionDriverTaskList(){
+        $this->crumbsTitle=Yii::t("default","Driver Task List");
+        $this->render('driver-task-list');
+    }
+
+    public function actionDriverList(){
+        $this->crumbsTitle=Yii::t("default","Driver List");
+        $this->render('driver-list');
+	}
+	public function actionDriverAdd(){
+        $this->crumbsTitle=Yii::t("default","Driver Add");
+		$this->render('driver-add');
+		
+	}
+	
     /**end@sobhon**/
 	
 	public function actionDishes()

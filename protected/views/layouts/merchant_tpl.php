@@ -5,6 +5,7 @@
 <title><?php echo CHtml::encode($this->pageTitle); ?></title>
 
 <link href="<?php echo Yii::app()->request->baseUrl; ?>/assets/css/admin.css" rel="stylesheet" />
+<link href="<?php echo Yii::app()->request->baseUrl; ?>/assets/css/nav.css" rel="stylesheet" />
 
 <link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
 
@@ -196,6 +197,11 @@
   href="<?php echo Yii::app()->request->baseUrl."/menu-".$merchant_info[0]->restaurant_slug;?>">
   <i class="fa fa-cutlery"></i> <?php echo t("View")?></a>
   </div>
+   <div class="right">
+        <a target="_blank" class="uk-button uk-button-primary uk-button-small uk-label-inprogress"
+           href="<?php echo Yii::app()->request->baseUrl."/merchant/createorder";?>">
+            <i class="fa fa-plus-circle"></i> <?php echo t("Create Orders")?></a>
+  </div>
   
   <?php if ( $merchant_info[0]->is_commission==2):?>
   <div class="right">
@@ -217,10 +223,13 @@
                 </div>
             </nav>
         </div>
-    <?php else: ?>
+    <?php else: //dump(Yii::app()->functions->merchantMenu()); die(); ?>
+
          <div class="left_panel left">
              <div class="menu">
-                 <?php $this->widget('zii.widgets.CMenu', Yii::app()->functions->merchantMenu());?>
+                 <nav class="cd-side-nav">
+                     <?php $this->widget('zii.widgets.CMenu', Yii::app()->functions->merchantMenu());?>
+                 </nav>
              </div>
          </div>
     <?php endif; ?>
@@ -257,7 +266,7 @@ if ( !empty($website_time_picker_format)){
 	echo CHtml::hiddenField('website_time_picker_format',$website_time_picker_format);
 }
 ?>
-</body>
+
 
 <!--*****************************************
 NOTIFICATION PLAYER STARTS HERE
@@ -373,12 +382,15 @@ var jsLanguageValidator=<?php echo json_encode($js_lang_validator)?>;
 <script src="<?php echo Yii::app()->request->baseUrl; ?>/assets/js/admin.js?ver=1" type="text/javascript"></script>  
 
 <script src="<?php echo Yii::app()->request->baseUrl; ?>/assets/js/merchant.js?ver=1" type="text/javascript"></script>
+<script src="<?php echo Yii::app()->request->baseUrl; ?>/assets/js/jquery.menu-aim.js" type="text/javascript"></script>
+<script src="<?php echo Yii::app()->request->baseUrl; ?>/assets/js/nav-sbn.js" type="text/javascript"></script>
 
 <?php if($merchant_user_type=="merchant_user" && $merchant_users_id==2):?>
     <script type="text/javascript">
         $("#yw0").addClass("uk-navbar-nav");
         $(".inner").removeClass('inner');
         $(".content_wrap").addClass('uk-container');
+        $(".has-children").removeAttr(span).append(a);
     </script>
     <style type="text/css">
         ul#yw0 > li > a > i {
@@ -392,4 +404,5 @@ var jsLanguageValidator=<?php echo json_encode($js_lang_validator)?>;
         }
     </style>
 <?php endif; ?>
+</body>
 </html>

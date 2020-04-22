@@ -473,6 +473,27 @@ class MerchantController extends CController
     	   $this->render('order-status');
     	}
     }
+    
+    /**
+     * create order from merchant admin
+     *
+     */
+    public function actionCreateOrder(){
+        $db_ext=new DbExt;
+        $stmt="SELECT item_id,item_name FROM {{item}} WHERE merchant_id = ".Yii::app()->functions->getMerchantID()." ";
+        $item_list= $db_ext->rst($stmt);
+        $item=array_column($item_list,'item_name','item_id');
+        $this->crumbsTitle=Yii::t("default","Create Order");
+        $this->render('create-orders',array('item'=>$item));
+    }
+    
+    /**
+     * Merchant backend order status
+     */
+     public function actionorderDetailsMerchantStore(){
+         $this->render('merchant-order-recipt',array('id'=>$_GET['id']));
+     }
+    
     /**
 	 * Start code by @sobhon
 	 * for marchant recurring code and caterring...	 * 
@@ -516,6 +537,90 @@ class MerchantController extends CController
         $this->render('merchant-pickup-orders');
     }
 
+    public function actionOrder(){
+		
+		$db_ext=new DbExt;
+		$stmt="SELECT item_id,item_name FROM
+				{{item}}
+				WHERE
+				merchant_id = ".Yii::app()->functions->getMerchantID()."
+				";		
+		$item_list= $db_ext->rst($stmt);
+		$item=array_column($item_list,'item_name','item_id');
+		
+		$this->render('orders',array('item'=>$item));
+								
+			if(isset($_POST["DbExt"])){
+
+			$params=array(
+				'id'=>Yii::app()->functions->getID(),
+				'name'=>$cutomer_name,
+				'mobile'=>$customer_mobile,
+				'order_items'=>$order_items,
+				'payment_method'=>$payment_method,
+				'order_type'=>$order_type,
+				'date_created'=>FunctionsV3::dateNow(),
+				'ip_address'=>$_SERVER['REMOTE_ADDR'],
+				
+			);	    	
+		
+			if ( $db_ext->insertData("{{order_details}}",$params)){		
+				echo "$params";	
+				//header('Location: '.Yii::app()->request->baseUrl."/merchant/smsReceipt/id/".Yii::app()->db->getLastInsertID());
+				die();
+			} else $error=Yii::t("default","ERROR: Cannot insert record.");	
+		}
+		
+	}
+
+	public function actionDriverReports(){
+
+        $cs = Yii::app()->getClientScript();
+        $cs->registerScriptFile('//amcharts.com/lib/3/amcharts.js', CClientScript::POS_END);
+        $cs->registerScriptFile('//amcharts.com/lib/3/serial.js', CClientScript::POS_END);
+        $cs->registerScriptFile('//amcharts.com/lib/3/themes/light.js', CClientScript::POS_END);
+        //$cs->registerScriptFile('../protected/modules/driver/assets/driver.js', CClientScript::POS_END);
+        $cs->registerScriptFile('../protected/modules/driver/assets/moment.js', CClientScript::POS_END);
+        $cs->registerScriptFile('../protected/modules/driver/assets/datetimepicker/jquery.datetimepicker.full.min.js', CClientScript::POS_END);
+
+        $mt_id=Yii::app()->functions->getMerchantID();
+        $user_type=$_SESSION['kr_merchant_user_type'];
+        $team_list=Driver::teamList($user_type,$mt_id);
+        //dump($team_list);die();
+        if($team_list){
+            $team_list=Driver::toList($team_list,'team_id','team_name',
+                Driver::t("All Team")
+            );
+        }
+        $all_driver=Driver::getAllDriver(
+            $user_type,$mt_id
+        );
+        //dump($team_list);die();
+        $start= date('Y-m-d', strtotime("-7 day") );
+        $end=date("Y-m-d", strtotime("+1 day"));
+
+        $this->render('driver-reports',array(
+            'team_list'=>$team_list,
+            'all_driver'=>$all_driver,
+            'start_date'=>$start,
+            'end_date'=>$end
+        ));
+
+	}
+	public function actionDriverTeam(){
+        $this->crumbsTitle=Yii::t("default","Teams");
+        $this->render('drivers-teams');
+    }
+
+    public function actionDriverTaskList(){
+        $this->crumbsTitle=Yii::t("default","Driver Task List");
+        $this->render('driver-task-list');
+    }
+
+    public function actionDriverList(){
+        $this->crumbsTitle=Yii::t("default","Driver List");
+        $this->render('driver-list');
+    }
 	 /**
 	  * end code by @sobhon
 	  */
@@ -725,7 +830,7 @@ class MerchantController extends CController
     public function actionDriverReview(){
         $this->crumbsTitle=Yii::t("default","Driver review and rating");
         $this->render('driver-review');
-    }
+	}	
     /**@sobhon**/
 	
 	public function actionReview()

@@ -3008,7 +3008,549 @@ $resto_info.="<p><span class=\"uk-text-bold\">".Yii::t("default","Delivery Est")
 	    public function clientLoginModal()
 	    {
 	    	$this->clientLogin();
-	    }	
+	    }
+
+
+	    public function placeOrderMerchant(){
+            //dump($_POST);
+            $p = new CHtmlPurifier();
+            $_SESSION['kr_merchant_id']=Yii::app()->functions->getMerchantID();
+            $mtid=isset($_SESSION['kr_merchant_id'])?$_SESSION['kr_merchant_id']:'';
+            if(empty($mtid)){
+                $this->msg=t("Merchant ID is missing");
+                return ;
+            }
+
+            // set merchant timezone
+            $mt_timezone=Yii::app()->functions->getOption("merchant_timezone",$mtid);
+            if (!empty($mt_timezone)){
+                Yii::app()->timeZone=$mt_timezone;
+            }
+
+            /*CHECK IF CLOSING TIME ALREADY*/
+            $order_delivery_date=isset($_SESSION['kr_delivery_options']['delivery_date'])?$_SESSION['kr_delivery_options']['delivery_date']:'';
+            if(!empty($order_delivery_date)){
+                $order_delivery_date=strtolower(date("Y-m-d",strtotime($order_delivery_date)));
+            }
+            $enabled_merchant_check_closing_time=getOptionA('enabled_merchant_check_closing_time');
+
+            $full_delivery_date=$_SESSION['kr_delivery_options']['delivery_date']." ".$_SESSION['kr_delivery_options']['delivery_time'];
+            if(!empty($order_delivery_date) && $enabled_merchant_check_closing_time==1){
+                $delivery_date=strtolower(date("D",strtotime($order_delivery_date)));
+                if(!empty($_SESSION['kr_delivery_options']['delivery_time'])){
+                    $delivery_time=date('h:i A',strtotime($full_delivery_date));
+                } else $delivery_time=date('h:i A',strtotime(date('c')));
+
+                //if ( $order_delivery_date==date("Y-m-d")){
+                if ( !Yii::app()->functions->isMerchantOpenTimes($mtid,$delivery_date,$delivery_time)){
+                    $this->msg=t("Sorry but merchant is already close");
+                    return ;
+                }
+                //}
+            }
+
+
+            /*check if merchant has enabled Order sms verification*/
+            if (isset($this->data['client_order_sms_code'])){
+                if (!empty($this->data['client_order_sms_code'])){
+                    if (!FunctionsK::validateOrderSMSCode($this->data['contact_phone'],$this->data['client_order_sms_code'],
+                        $this->data['client_order_session'])){
+                        $this->msg=t("Sorry but you have input invalid order sms code");
+                        return ;
+                    }
+                }
+            }
+
+            /** re-check delivery address */
+            if ( $this->data['delivery_type']=="delivery"){
+                /*$functionsk=new FunctionsK();
+                if (!$functionsk->reCheckDelivery($this->data,$mtid)){
+                    $mt_delivery_miles=Yii::app()->functions->getOption("merchant_delivery_miles",$mtid);
+                    $unit=Yii::app()->functions->getOption("merchant_distance_type",$mtid);
+                    $this->msg=t("Sorry but this merchant delivers only with in ").$mt_delivery_miles."$unit";
+                    return ;
+                }*/
+
+                /*Version 3 change getting of delivery fee*/
+                if (!FunctionsV3::isSearchByLocation()){
+                    if (!FunctionsV3::reCheckDelivery($mtid,$this->data)){
+                        $mt_delivery_miles=getOption($mtid,'merchant_delivery_miles');
+                        $distance_type=FunctionsV3::getMerchantDistanceType($mtid);
+                        $unit=$distance_type=="M"?t("miles"):t("kilometers");
+                        $this->msg=t("Sorry but this merchant delivers only with in ").$mt_delivery_miles." $unit";
+                        return ;
+                    }
+                } else {
+                    $disabled_order_confirm_page = getOptionA('disabled_order_confirm_page');
+                    if($disabled_order_confirm_page==1){
+                        if(isset($this->data['address_book_id_location'])){
+                            $address_book_id_location = $this->data['address_book_id_location'];
+                            if($res_book = FunctionsV3::getAddressByLocationFullDetails($address_book_id_location)){
+                                $this->data['state_id']=$res_book['state_id'];
+                                $this->data['city_id']=$res_book['city_id'];
+                                $this->data['area_id']=$res_book['area_id'];
+                                $this->data['street'] = $res_book['street'];
+                                $this->data['city'] = $res_book['city_name'];
+                                $this->data['state'] = $res_book['state_name'];
+                                $this->data['area_name'] = $res_book['area_name'];
+                                $this->data['location_name'] = $res_book['location_name'];
+                                $this->data['zipcode'] = $res_book['postal_code'];
+                            }
+                        }
+                        $params_check=array(
+                            'state_id'=>$this->data['state_id'],
+                            'city_id'=>$this->data['city_id'],
+                            'area_id'=>$this->data['area_id'],
+                            'location_city'=>isset($this->data['city'])?$this->data['city']:'',
+                            'city_name'=>isset($this->data['city'])?$this->data['city']:'',
+                            'location_area'=>isset($this->data['area_name'])?$this->data['area_name']:'',
+                            'location_type'=>getOptionA('admin_zipcode_searchtype')
+                        );
+
+                        if ( $fee=FunctionsV3::validateCanDeliverByLocation($mtid,$params_check)){
+                            $_SESSION['shipping_fee']=$fee['fee'];
+                        } else {
+                            $this->msg=t("Sorry this merchant does not deliver to your location");
+                            return ;
+                        }
+                    }
+                }
+            }
+            /** re-check delivery address */
+            $this->data['merchant_id']=$_SESSION['kr_merchant_id'];
+
+            $default_order_status=Yii::app()->functions->getOption("default_order_status",$_SESSION['kr_merchant_id']);
+            $order_item=isset($_SESSION['kr_item'])?$_SESSION['kr_item']:'';
+            if (is_array($order_item) && count($order_item)>=1){
+                //dump($this->data);
+
+                /** card fee condition */
+                $card_fee='';
+                switch ($this->data['payment_opt'])
+                {
+                    case "pyp":
+                        //if ( Yii::app()->functions->isMerchantCommission($this->data['merchant_id'])){
+                        if (FunctionsV3::isMerchantPaymentToUseAdmin($this->data['merchant_id'])){
+                            $card_fee=Yii::app()->functions->getOptionAdmin('admin_paypal_fee');
+                        } else {
+                            $card_fee=Yii::app()->functions->getOption('merchant_paypal_fee',
+                                $this->data['merchant_id']);
+                        }
+                        break;
+
+                    case "paymill":
+                        if ( $credentials=KPaymill::getCredentials($this->data['merchant_id'])){
+                            if($credentials['card_fee1']>0.001){
+                                $credentials['card_fee2']=is_numeric($credentials['card_fee2'])?$credentials['card_fee2']:0;
+                                $card_fee = $this->data['x_subtotal']*($credentials['card_fee1']/100)+$credentials['card_fee2'];
+                            }
+                        }
+                        break;
+
+                    case "strip_ideal":
+                        if ( $credentials=StripeIdeal::getCredentials($this->data['merchant_id'])){
+                            if(is_numeric($credentials['ideal_fee'])){
+                                if($credentials['ideal_fee']>=0.0001){
+                                    $card_fee=$credentials['ideal_fee'];
+                                }
+                            }
+                        }
+                        break;
+
+                    case "mol":
+                        if ($credentials=MollieClass::getCredentials($this->data['merchant_id'])){
+                            if(is_numeric($credentials['card_fee'])){
+                                if($credentials['card_fee']>=0.0001){
+                                    $card_fee=$credentials['card_fee'];
+                                }
+                            }
+                        }
+                        break;
+
+                    case "wirecard":
+                        if ($credentials = WireCard::getCredentials($this->data['merchant_id'])){
+                            if($credentials['fee1']>0.001){
+                                $credentials['fee2']=is_numeric($credentials['fee2'])?$credentials['fee2']:0;
+                                $card_fee = $this->data['x_subtotal']*($credentials['fee1']/100)+$credentials['fee2'];
+                            }
+                        }
+                        break;
+
+                    case "stp":
+                        if($credentials = StripeWrapper::getCredentials($this->data['merchant_id'])){
+                            if(is_numeric($credentials['card_fee'])){
+                                if($credentials['card_fee']>0.0001){
+                                    $card_fee=$credentials['card_fee'];
+                                }
+                            }
+                        }
+                        break;
+
+                    case "paypal_v2":
+                        if($credentials = PaypalWrapper::getCredentials($this->data['merchant_id'])){
+                            if(is_numeric($credentials['card_fee'])){
+                                if($credentials['card_fee']>0.0001){
+                                    $card_fee=$credentials['card_fee'];
+                                }
+                            }
+                        }
+                        break;
+
+                    case "mercadopago":
+                        if($credentials = mercadopagoWrapper::getCredentials($this->data['merchant_id'])){
+                            if(is_numeric($credentials['card_fee'])){
+                                if($credentials['card_fee']>0.0001){
+                                    $card_fee=$credentials['card_fee'];
+                                }
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+
+                //dump($card_fee); die();
+
+                if ( !empty($card_fee) && $card_fee>=0.0001){
+                    $this->data['card_fee']=$card_fee;
+                }
+                /** end card fee */
+
+                Yii::app()->functions->displayOrderHTML($this->data,$_SESSION['kr_item']);
+                if ( Yii::app()->functions->code==1){
+                    //dump("<h2>RESP</h2>");
+
+                    /*ITEM TAXABLE*/
+                    $apply_tax=0;
+                    if(!empty($mtid)){
+                        $apply_tax=getOption($mtid,'merchant_apply_tax');
+                        $tax_set=FunctionsV3::getMerchantTax($mtid);
+                        if ( $apply_tax==1 && $tax_set>0){
+                            Yii::app()->functions->details['raw']=$_SESSION['cart_item_tax'];
+                        }
+                    }
+
+                    $raw=Yii::app()->functions->details['raw'];
+                    $single_price=$raw['total']['subtotal'];
+                    /*recurring order*/
+                    if($_SESSION['kr_recurring_order']['total_total_price']){
+                        $_SESSION['kmrs_subtotal']=$_SESSION['kr_recurring_order']['total_total_price'];
+                        $raw['total']['subtotal']=$raw['total']['subtotal']*$_SESSION['kr_recurring_order']['total_day'];
+                    }
+                    /*end recurring order*/
+                    //dump();die();
+                    $client_id=mt_rand(1000,9999);
+                    if (is_array($raw) && count($raw)>=1){
+                        $params=array(
+                            'merchant_id'=>$this->data['merchant_id'],
+                            'client_id'=>$client_id,
+                            'json_details'=>json_encode($order_item),
+                            'otp'=>$client_id,
+                            'contact_phone'=>$this->data['contact_phone'],
+                            'trans_type'=>isset($_SESSION['kr_delivery_options']['delivery_type'])?$_SESSION['kr_delivery_options']['delivery_type']:'',
+                            'payment_type'=>isset($this->data['payment_method'])?$this->data['payment_method']:'',
+                            'sub_total'=>isset($raw['total']['subtotal'])?$raw['total']['subtotal']:'',
+                            //'tax'=>isset($raw['total']['tax'])?$raw['total']['tax']:'0',
+                            'tax'=>is_numeric($raw['total']['tax'])?$raw['total']['tax']:0,
+                            'taxable_total'=>isset($raw['total']['taxable_total'])?$raw['total']['taxable_total']:'',
+                            'total_w_tax'=>isset($raw['total']['total'])?$raw['total']['total']:'',
+                            'delivery_charge'=>isset($raw['total']['delivery_charges'])?$raw['total']['delivery_charges']:'',
+                            'delivery_date'=>date('Y-m-d'),
+                            'delivery_time'=>isset($_SESSION['kr_delivery_options']['delivery_time'])?$_SESSION['kr_delivery_options']['delivery_time']:'',
+                            'delivery_asap'=>isset($_SESSION['kr_delivery_options']['delivery_asap'])?$_SESSION['kr_delivery_options']['delivery_asap']:'',
+                            'date_created'=>FunctionsV3::dateNow(),
+                            'ip_address'=>$_SERVER['REMOTE_ADDR'],
+                            'delivery_instruction'=>isset($this->data['delivery_instruction'])?$p->purify($this->data['delivery_instruction']):'',
+                            'cc_id'=>isset($this->data['cc_id'])?$this->data['cc_id']:'',
+                            'request_from'=>"store",
+                            'order_change'=>isset($this->data['order_change'])?str_replace(",",'',$this->data['order_change']):'',
+                            'payment_provider_name'=>isset($this->data['payment_provider_name'])?$this->data['payment_provider_name']:'',
+                            'apply_food_tax'=>$apply_tax,
+                            'calculation_method'=>FunctionsV3::getReceiptCalculationMethod()
+                        );
+
+                        /*FIXED ORDER STATUS*/
+                        if ($this->data['payment_opt']=="cod" || $this->data['payment_opt']=="pyr" || $this->data['payment_opt']=="ccr" || $this->data['payment_opt']=="ocr" ){
+                            if (!empty($default_order_status)){
+                                $params['status']=$default_order_status;
+                            } else $params['status']="pending";
+                        } else $params['status']=initialStatus();
+
+                        if ($this->data['payment_opt']=="obd"){
+                            $params['status']="pending";
+                        }
+
+                        /*PROMO*/
+                        //dump($raw);
+                        if (isset($raw['total']['discounted_amount'])){
+                            if ($raw['total']['discounted_amount']>=0.0001){
+                                $params['discounted_amount']=$raw['total']['discounted_amount'];
+                                $params['discount_percentage']=$raw['total']['merchant_discount_amount'];
+                            }
+                        }
+
+
+                        /*VOUCHER*/
+                        $has_voucher=false;
+                        if (isset($_SESSION['voucher_code'])){
+                            if (is_array($_SESSION['voucher_code'])){
+                                $params['voucher_amount']=$_SESSION['voucher_code']['amount'];
+                                $params['voucher_code']=$_SESSION['voucher_code']['voucher_name'];
+                                $params['voucher_type']=$_SESSION['voucher_code']['voucher_type'];
+                                $has_voucher=true;
+                            }
+                        }
+
+
+
+
+//$params['cart_tip_percentage']=$raw['total']['cart_tip_percentage']/100;
+                        $params['cart_tip_percentage']=$raw['total']['cart_tip_percentage'];
+                        $params['cart_tip_value']=$raw['total']['tips'];
+
+//dump($params); die();
+
+                        /*Commission*/
+                        if ( Yii::app()->functions->isMerchantCommission($this->data['merchant_id'])){
+                            $admin_commision_ontop=Yii::app()->functions->getOptionAdmin('admin_commision_ontop');
+                            if ( $com=Yii::app()->functions->getMerchantCommission($this->data['merchant_id'])){
+                                $params['percent_commision']=$com;
+                                $params['total_commission']=($com/100)*$params['total_w_tax'];
+                                $params['merchant_earnings']=$params['total_w_tax']-$params['total_commission'];
+                                if ( $admin_commision_ontop==1){
+                                    $params['total_commission']=($com/100)*$params['sub_total'];
+                                    $params['commision_ontop']=$admin_commision_ontop;
+                                    $params['merchant_earnings']=$params['sub_total']-$params['total_commission'];
+                                }
+                            }
+
+                            /** check if merchant commission is fixed  */
+                            $merchant_com_details=Yii::app()->functions->getMerchantCommissionDetails($this->data['merchant_id']);
+
+                            if ( $merchant_com_details['commision_type']=="fixed"){
+                                $params['percent_commision']=$merchant_com_details['percent_commision'];
+                                $params['total_commission']=$merchant_com_details['percent_commision'];
+                                $params['merchant_earnings']=$params['total_w_tax']-$merchant_com_details['percent_commision'];
+                                $params['commision_type']='fixed';
+
+                                if ( $admin_commision_ontop==1){
+                                    $params['merchant_earnings']=$params['sub_total']-$merchant_com_details['percent_commision'];
+                                }
+                            }
+                        }/** end commission condition*/
+
+
+                        if(isset($raw['total'])){
+                            if(isset($raw['total']['merchant_packaging_charge'])){
+                                if(is_numeric($raw['total']['merchant_packaging_charge'])){
+                                    $params['packaging'] = $raw['total']['merchant_packaging_charge'];
+                                }
+                            }
+                        }
+                        // fixed packaging by saving the packaging charge to db
+
+
+                        /** card fee */
+                        if ( !empty($card_fee) && $card_fee>=0.1){
+                            $params['card_fee']=$card_fee;
+                        }
+
+                        /*if has address book selected*/
+                        if ( isset($this->data['address_book_id'])){
+                            if ($address_book=Yii::app()->functions->getAddressBookByID($this->data['address_book_id'])){
+                                $this->data['street']=$address_book['street'];
+                                $this->data['city']=$address_book['city'];
+                                $this->data['state']=$address_book['state'];
+                                $this->data['zipcode']=$address_book['zipcode'];
+                                $this->data['location_name']=$address_book['location_name'];
+                            }
+                        }
+
+                        $country_code='';
+                        $country_name='';
+
+                        if ( Yii::app()->functions->getOptionAdmin('website_enabled_map_address')==2){
+                            if (isset($this->data['map_address_toogle'])){
+                                if ( $this->data['map_address_toogle']==2){
+                                    /*$geo_res=geoCoding($this->data['map_address_lat'],
+                                    $this->data['map_address_lng']);*/
+
+                                    $geo_res=FunctionsV3::latToAdress($this->data['map_address_lat'],
+                                        $this->data['map_address_lng']);
+                                    if ($geo_res){
+                                        $this->data['street']=isset($geo_res['address'])?$geo_res['address']." ":'';
+                                        $this->data['city']=isset($geo_res['city'])?$geo_res['city']:'';
+                                        $this->data['state']=isset($geo_res['state'])?$geo_res['state']:'';
+                                        $this->data['zipcode']=isset($geo_res['zip'])?$geo_res['zip']:'';
+
+                                        $country_code=isset($geo_res['country_code'])?$geo_res['country_code']:'';
+                                        $country_name=isset($geo_res['country'])?$geo_res['country']:'';
+                                    } else {
+                                        $this->msg=t("Sorry but something wrong when geocoding your address");
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+
+                        /** check if item is taxable*/
+                        if (Yii::app()->functions->getOption("merchant_tax_charges",$mtid)==2){
+                            $params['donot_apply_tax_delivery']=2;
+                        }
+
+                        /*POINTS PROGRAM*/
+                        if (FunctionsV3::hasModuleAddon("pointsprogram")){
+                            if (isset($_SESSION['pts_redeem_amt'])){
+                                $params['points_discount']=$_SESSION['pts_redeem_amt'];
+                            }
+                        }
+
+
+                        $params['order_id_token']=FunctionsV3::generateOrderToken();
+                        $params['dinein_number_of_guest']=isset($this->data['dinein_number_of_guest'])?$this->data['dinein_number_of_guest']:'';
+                        $params['dinein_special_instruction']=isset($this->data['dinein_special_instruction'])?$this->data['dinein_special_instruction']:'';
+
+                        if ($params['cc_id']=="undefined"){
+                            $params['cc_id']=0;
+                        }
+
+                        if(!is_numeric($params['cc_id'])){
+                            $params['cc_id']=0;
+                        }
+
+                        if(!is_numeric($params['order_change'])){
+                            $params['order_change']=0;
+                        }
+
+                        if(!is_numeric($params['apply_food_tax'])){
+                            $params['apply_food_tax']=0;
+                        }
+                        if(!is_numeric($params['cart_tip_percentage'])){
+                            $params['cart_tip_percentage']=0;
+                        }
+                        if(!is_numeric($params['cart_tip_value'])){
+                            $params['cart_tip_value']=0;
+                        }
+
+                        if(isset($params['packaging'])){
+                            if(!is_numeric($params['packaging'])){
+                                $params['packaging']=0;
+                            }
+                        }
+
+                        if(isset($this->data['dinein_table_number'])){
+                            $params['dinein_table_number']=$this->data['dinein_table_number'];
+                        }
+
+                        /*insert data to database*/
+                        if ($this->insertData("{{order}}",$params)){
+                            $order_id=Yii::app()->db->getLastInsertID();
+                            /*POINTS PROGRAM*/
+                            if(!isset($this->data['is_guest_checkout'])){
+                                if (FunctionsV3::hasModuleAddon("pointsprogram")){
+                                    PointsProgram::saveEarnPoints(
+                                        isset($_SESSION['pts_earn'])?$_SESSION['pts_earn']:'',
+                                        $client_id,
+                                        $this->data['merchant_id'],
+                                        $order_id,
+                                        $this->data['payment_opt'],
+                                        $params['status'],
+                                        $order_id
+                                    );
+
+                                    if (isset($_SESSION['pts_redeem_points'])){
+                                        PointsProgram::saveExpensesPoints(
+                                            $_SESSION['pts_redeem_points'],
+                                            $_SESSION['pts_redeem_amt'],
+                                            $client_id,
+                                            $this->data['merchant_id'],
+                                            $order_id,
+                                            $this->data['payment_method']
+                                        );
+                                    }
+                                }
+                            }
+
+                            /*VOUCHER*/
+                            if ($has_voucher==TRUE){
+                                Yii::app()->functions->updateVoucher($_SESSION['voucher_code']['voucher_name'],
+                                    Yii::app()->functions->getClientId(),$order_id);
+                            }
+
+                            foreach ($raw['item'] as $val) {
+                                $params_order_details=array(
+                                    'order_id'=>$order_id,
+                                    'client_id'=>$client_id,
+                                    'item_id'=>isset($val['item_id'])?$val['item_id']:'',
+                                    'item_name'=>isset($val['item_name'])?$val['item_name']:'',
+                                    'order_notes'=>isset($val['order_notes'])?$val['order_notes']:'',
+                                    'normal_price'=>isset($val['normal_price'])?$val['normal_price']:'',
+                                    'discounted_price'=>isset($val['discounted_price'])?$val['discounted_price']:'',
+                                    'size'=>isset($val['size_words'])?$val['size_words']:'',
+                                    'qty'=>isset($val['qty'])?$val['qty']:'',
+                                    'addon'=>isset($val['sub_item'])?json_encode($val['sub_item']):'',
+                                    'cooking_ref'=>isset($val['cooking_ref'])?$val['cooking_ref']:'',
+                                    'ingredients'=>isset($val['ingredients'])?json_encode($val['ingredients']):'',
+                                    'non_taxable'=>isset($val['non_taxable'])?$val['non_taxable']:1
+                                );
+                                $this->insertData("{{order_details}}",$params_order_details);
+                            }
+
+                            /*PICKUP TRANSACTION SAVE MOBILE NUMBER
+                            if ( $this->data['delivery_type']=="pickup"){
+                                $this->updateData("{{client}}",array(
+                                    'contact_phone'=>$this->data['contact_phone']
+                                ),'client_id',
+                                    Yii::app()->functions->getClientId());
+                            }*/
+
+                            $this->code=1;
+
+                            /*Driver app*/
+                            if (FunctionsV3::hasModuleAddon("driver")){
+                                Yii::app()->setImport(array(
+                                    'application.modules.driver.components.*',
+                                ));
+                                Driver::addToTask($order_id);
+                            }
+                            switch ($this->data['payment_method'])
+                            {
+                                case "cash":
+                                    if (method_exists("FunctionsV3","updatePoints")){
+                                        FunctionsV3::updatePoints($order_id,$params['status']);
+                                    }
+
+                                    break;
+                                case "card":
+                                    $this->msg=Yii::t("default","Your order has been placed.");
+
+                                    if (method_exists("FunctionsV3","updatePoints")){
+                                        FunctionsV3::updatePoints($order_id,$params['status']);
+                                    }
+
+                                    break;
+                                default:
+                                    $this->msg=Yii::t("default","something wrong");
+                                    break;
+                            }
+
+                            $payment_action="order-details-merchant-store";
+
+
+                            $this->details=array(
+                                'order_id'=>$order_id,
+                                'payment_type'=>$this->data['payment_method'],
+                                'payment_link'=>Yii::app()->createUrl("/merchant/$payment_action",array(
+                                    'id'=>$order_id
+                                ))
+                            );
+
+                        } else $this->msg=Yii::t("default","ERROR: Cannot insert records.");
+                    } else $this->msg=Yii::t("default","ERROR: Something went wrong");
+                } else $this->msg=Yii::app()->functions->msg;
+            } else $this->msg=Yii::t("default","Sorry but your order is empty");
+        }
 	    
 	    public function placeOrder()
 	    {	
@@ -3094,7 +3636,6 @@ $resto_info.="<p><span class=\"uk-text-bold\">".Yii::t("default","Delivery Est")
 		    			   	    $this->data['state_id']=$res_book['state_id'];
 			    				$this->data['city_id']=$res_book['city_id'];
 			    				$this->data['area_id']=$res_book['area_id'];
-			    				
 			    				$this->data['street'] = $res_book['street'];    				
 			    				$this->data['city'] = $res_book['city_name'];
 			    				$this->data['state'] = $res_book['state_name'];
@@ -4670,10 +5211,20 @@ $params['cart_tip_value']=$raw['total']['tips'];
                     $final_data[$f_data]=$f_data;
                 }
                 unset($final_data['Please select']);
+                if(in_array('accepted',$history_status)){
+                    unset($final_data['pending']);
+                    unset($final_data['paid']);
+                    unset($final_data['decline']);
+                }
             }else{
-                $final_data=$status_list;
-			}
-			dump($final_data);
+                $whitelist = array(
+                    'accepted',
+                    'decline'
+                );
+                $filtered = array_intersect_key( $status_list, array_flip( $whitelist ) );
+                $final_data=$filtered;
+            }
+            ksort($final_data);
 	    	?>
 	    	<div class="view-receipt-pop">
 	    	 <h3><?php echo Yii::t("default",'Change Order Status')?></h3>
@@ -5083,7 +5634,73 @@ $params['cart_tip_value']=$raw['total']['tips'];
 	    		$this->otableOutput($feed_data);
 	    	}	   
 	    	$this->otableNodata();
-	    }		    
+	    }
+
+        /**
+         * All Merchant incoming order@sobhon
+         * @getMerchantIncommingOrder
+         *ALTER TABLE `mt_order` ADD `contact_phone` VARCHAR(15) NULL AFTER `client_id`;
+         */
+
+        public function getMerchantStoreOrder(){
+            $DbExt= new DbExt();
+            $m_id=Yii::app()->functions->getMerchantID();
+            $query_statement="SELECT a.*,	    	
+			    	
+	    	(select group_concat(item_name) from {{order_details}} where order_id=a.order_id ) as item	    	
+	    	FROM {{order}} a
+	    	WHERE
+	    	merchant_id= ".FunctionsV3::q($m_id)."
+	    	
+			AND status NOT in ('payment_failed')
+			AND request_from='store'
+			AND payment_type='cash'
+	    	AND request_cancel = '2' ORDER BY delivery_date DESC ";
+
+            //AND recurring_id IS NOT NULL AND status NOT in ('".initialStatus()."')
+            if ( $res=$DbExt->rst($query_statement)){
+                //dump($res);die();
+                foreach ($res as $val) {
+                    $new='';
+                    $action="<a data-id=\"".$val['order_id']."\" class=\"edit-order\" href=\"javascript:\">".Yii::t("default","Edit")."</a>";
+                    $action.="<a data-id=\"".$val['order_id']."\" class=\"view-receipt\" href=\"javascript:\">".Yii::t("default","View")."</a>";
+
+                    $action.="<a data-id=\"".$val['order_id']."\" class=\"view-order-history\" href=\"javascript:\">".Yii::t("default","History")."</a>";
+
+                    if ($val['viewed']==1){
+                        $new=" <div class=\"uk-badge\">".Yii::t("default","NEW")."</div>";
+                    }
+
+
+                    $date=FormatDateTime($val['delivery_date']);
+                    $item=FunctionsV3::translateFoodItemByOrderId(
+                        $val['order_id'],
+                        'kr_merchant_lang_id'
+                    );
+                    // $item=FunctionsV3::getItemNameRecurringOnly($val['order_id']);
+
+                    $feed_data['aaData'][]=array(
+                        $val['order_id'],
+                        $date,
+                        $val['contact_phone'].$new,
+                        $item,
+                        "<small>Trans type:</small> ".t($val['trans_type']).
+                        "<br><small>Method:</small> ".FunctionsV3::prettyPaymentType('payment_order',$val['payment_type'],$val['order_id'],$val['trans_type']).
+                        "<br><small>Platform:</small> ".t($val['request_from']),
+                        "<small>Total:</small> ".prettyFormat($val['sub_total'],$m_id).
+                        "<br><small>Tax:</small> ".prettyFormat($val['taxable_total'],$m_id).
+                        "<br><small>W/Tax:</small> ".prettyFormat($val['total_w_tax'],$m_id),
+                        "<span class=\"uk-label uk-label-".$val['status']."\">".t($val['status'])."</span>",
+                        $action,
+                        $val['t_color']
+                    );
+                }
+                $this->otableOutput($feed_data);
+            }
+            $this->otableNodata();
+
+
+        }
 	    
 	    /**
          * All Merchant incoming order@sobhon
@@ -5139,7 +5756,7 @@ $params['cart_tip_value']=$raw['total']['tips'];
                         "<small>Total:</small> ".prettyFormat($val['sub_total'],$m_id).
                         "<br><small>Tax:</small> ".prettyFormat($val['taxable_total'],$m_id).
                         "<br><small>W/Tax:</small> ".prettyFormat($val['total_w_tax'],$m_id),
-                        "<span class=\"tag ".$val['status']."\">".t($val['status'])."</span>",
+                        "<span class=\"uk-label uk-label-".$val['status']."\">".t($val['status'])."</span>",
                         $action,
                         $val['t_color']
                     );
@@ -5204,7 +5821,7 @@ $params['cart_tip_value']=$raw['total']['tips'];
                         "<small>Total:</small> ".prettyFormat($val['sub_total'],$m_id).
                         "<br><small>Tax:</small> ".prettyFormat($val['taxable_total'],$m_id).
                         "<br><small>W/Tax:</small> ".prettyFormat($val['total_w_tax'],$m_id),
-                        "<span class=\"tag ".$val['status']."\">".t($val['status'])."</span>",
+                        "<span class=\"uk-label uk-label-".$val['status']."\">".t($val['status'])."</span>",
                         $action,
                         $val['t_color']
                     );
@@ -5215,6 +5832,7 @@ $params['cart_tip_value']=$raw['total']['tips'];
 
 
         }
+
 	    /**
 	     *"<span class=\"tag ".$val['status']."\">".t($val['status'])."</span>", 
 		 * Recuring Order details
@@ -5273,7 +5891,7 @@ $params['cart_tip_value']=$raw['total']['tips'];
                         "<small>Total:</small> ".prettyFormat($val['sub_total'],$m_id).
                         "<br><small>Tax:</small> ".prettyFormat($val['taxable_total'],$m_id).
                         "<br><small>W/Tax:</small> ".prettyFormat($val['total_w_tax'],$m_id),
-                        "<span class=\"tag ".$val['status']."\">".t($val['status'])."</span>",
+                        "<span class=\"uk-label uk-label-".$val['status']."\">".t($val['status'])."</span>",
                         $action,
                         $val['t_color']
                     );
@@ -10109,6 +10727,206 @@ $last_login=$val['last_login']=="0000-00-00 00:00:00"?"":date('M d,Y G:i:s',strt
                 $this->otableOutput($feed_data);
             }
             $this->otableNodata();
+		}
+		
+		public function driverAjaxTeam(){
+            $aColumns = array(
+                'a.team_id','a.team_name','a.team_name','a.status','a.date_created'
+            );
+            $t=AjaxDataTables::AjaxData($aColumns);
+            if (isset($_GET['debug'])){
+                dump($t);
+            }
+
+            if (is_array($t) && count($t)>=1){
+                $sWhere=$t['sWhere'];
+                $sOrder=$t['sOrder'];
+                $sLimit=$t['sLimit'];
+            }
+
+            $and='';
+            if ( Driver::getUserType()=="admin"){
+                $and =" AND user_type=".Driver::q(Driver::getUserType())."";
+            } else {
+                $and =" AND user_type=".Driver::q(Driver::getUserType())."";
+                $and.=" AND user_id=".Driver::q(Driver::getUserId())."  ";
+            }
+
+            $stmt="SELECT SQL_CALC_FOUND_ROWS a.*,
+			(
+			select count(*)
+			from
+			{{driver}}
+			where			
+			team_id=a.team_id
+			) as total_driver
+		FROM
+		{{driver_team}} a
+		WHERE 1
+		$and		
+		$sWhere
+		$sOrder
+		$sLimit
+		";
+            if (isset($_GET['debug'])){
+                dump($stmt);
+            }
+
+            $DbExt=new DbExt;
+            if ( $res=$DbExt->rst($stmt)){
+
+                $iTotalRecords=0;
+                $stmtc="SELECT FOUND_ROWS() as total_records";
+                if ( $resc=$DbExt->rst($stmtc)){
+                    $iTotalRecords=$resc[0]['total_records'];
+                }
+
+                $feed_data['sEcho']=intval($_GET['sEcho']);
+                $feed_data['iTotalRecords']=$iTotalRecords;
+                $feed_data['iTotalDisplayRecords']=$iTotalRecords;
+
+                foreach ($res as $val) {
+                    $date_created=Yii::app()->functions->prettyDate($val['date_created'],true);
+                    $date_created=Yii::app()->functions->translateDate($date_created);
+
+                    $id=$val['team_id'];
+                    $p="id=$id"."&tbl=driver_team&whereid=team_id";
+
+                    $actions="<div class=\"options\">";
+                    $actions.="<a data-modal=\".create-team\" data-id=\"$id\" 
+			    data-action=\"getTeam\"
+			    class=\"table-edit\" href=\"javascript:;\">".Driver::t("Edit")."</a>";
+
+                    $actions.="&nbsp;|&nbsp;";
+
+                    $actions.="<a data-data=\"$p\" class=\"table-delete\" href=\"javascript:;\">".Driver::t("Delete")."</a>";
+                    $actions.="</div>";
+
+                    $feed_data['aaData'][]=array(
+                        $val['team_id'],
+                        $val['team_name'].$actions,
+                        $val['total_driver'],
+                        '<span class="btn btn-default uk-button uk-button-primary uk-button-small">'.Driver::t($val['status'])."</span>",
+                        $date_created,
+                    );
+                }
+                if (isset($_GET['debug'])){
+                    dump($feed_data);
+                }
+                $this->otableOutput($feed_data);
+            }
+            $this->otableNodata();
+		}
+		
+
+		//get data for edit teams
+        public function actiongetTeam()
+        {
+            if($res=Driver::getTeam($this->data['id'])){
+                $this->code=1;
+                $this->msg=Driver::t("Successful");
+                /*if(!empty($res['team_member'])){
+                    $res['team_member']=json_decode($res['team_member'],true);
+                }*/
+                //dump($res);
+                if ($driver=Driver::getDriverByTeam($res['team_id'])){
+                    foreach ($driver as $val) {
+                        $res['team_member'][]=$val['driver_id'];
+                    }
+                } else $res['team_member']='';
+                //dump($res);
+                $this->details=$res;
+            } else $this->msg=Driver::t("Record not found");
+            $this->jsonResponse();
+		}
+		
+		public function driverAjaxTask(){
+            $aColumns = array(
+                'task_id','order_id','trans_type','task_description',
+                'driver_name','customer_name','delivery_address','delivery_date'
+            );
+            $t=AjaxDataTables::AjaxData($aColumns);
+            if (isset($_GET['debug'])){
+                dump($t);
+            }
+
+            if (is_array($t) && count($t)>=1){
+                $sWhere=$t['sWhere'];
+                $sOrder=$t['sOrder'];
+                $sLimit=$t['sLimit'];
+            }
+
+            $and='';
+            if ( Driver::getUserType()=="admin"){
+                //$and=" AND user_type=".Driver::q(Driver::getUserType())."  ";
+            } else {
+                $and=" AND user_type=".Driver::q(Driver::getUserType())."";
+                $and.=" AND user_id=".Driver::q(Driver::getUserId())."  ";
+            }
+
+            $stmt="SELECT SQL_CALC_FOUND_ROWS *
+		FROM
+		{{driver_task_view}}
+		WHERE 1		
+		$and
+		$sWhere
+		$sOrder
+		$sLimit
+		";
+            if (isset($_GET['debug'])){
+                dump($stmt);
+            }
+
+            $_SESSION['driver_stmt_taskList'] = $stmt;
+
+            $DbExt=new DbExt;
+            $DbExt->qry("SET SQL_BIG_SELECTS=1");
+
+            if ( $res=$DbExt->rst($stmt)){
+
+                $iTotalRecords=0;
+                $stmtc="SELECT FOUND_ROWS() as total_records";
+                if ( $resc=$DbExt->rst($stmtc)){
+                    $iTotalRecords=$resc[0]['total_records'];
+                }
+
+                $feed_data['sEcho']=intval($_GET['sEcho']);
+                $feed_data['iTotalRecords']=$iTotalRecords;
+                $feed_data['iTotalDisplayRecords']=$iTotalRecords;
+
+                foreach ($res as $val) {
+                    $date_created=Yii::app()->functions->prettyDate($val['delivery_date'],true);
+                    $date_created=Yii::app()->functions->translateDate($date_created);
+
+                    $status="<label class=\"tag uk-label-".$val['status']." \">".Driver::t($val['status'])."</label>";
+
+                    $action="<a class=\"btn btn-primary task-details uk-button uk-button-secondary uk-button-small\"
+			    	data-id=\"".$val['task_id']."\" href=\"javascript:;\">".Driver::t("Details")."</a>";
+
+                    if ( $val['status']=="unassigned"){
+                        $action="<a class=\"btn btn-default assign-agent uk-button uk-button-primary uk-button-small\"
+			    	data-id=\"".$val['task_id']."\" href=\"javascript:;\">".Driver::t("Assigned")."</a>";
+                    }
+
+                    $feed_data['aaData'][]=array(
+                        $val['task_id'],
+                        $val['order_id']>0?$val['order_id']:'',
+                        Driver::t($val['trans_type']),
+                        $val['task_description'],
+                        $val['driver_name'],
+                        $val['customer_name'],
+                        $val['delivery_address'],
+                        $date_created,
+                        $status,
+                        $action
+                    );
+                }
+                if (isset($_GET['debug'])){
+                    dump($feed_data);
+                }
+                $this->otableOutput($feed_data);
+            }
+            $this->otableNodata();
         }
         /**@sobhon**/
 		
@@ -12454,6 +13272,27 @@ $last_login=$val['last_login']=="0000-00-00 00:00:00"?"":date('M d,Y G:i:s',strt
 			$this->code=1;
 	    	$this->msg=Yii::t("default","Setting saved");
 		}	
+		
+		
+		public function storeChat(){
+		    $param_to_insert=array(
+		            'order_id'=>$this->data['order_id'],
+                    'sender_userid'=>$this->data['client_id'],
+                    'reciever_userid'=>$this->data['driver_id'],
+                    'merchant_id'=>$this->data['merchant_id'],
+                    'driver_id'=>$this->data['driver_id'],
+                    'client_id'=>$this->data['client_id'],
+                    'message'=>$this->data['message'],
+                    'status'=>1
+            );
+            if ( $this->insertData("{{chat}}",$param_to_insert)) {
+                $this->details = Yii::app()->db->getLastInsertID();
+                $this->code = 1;
+                $this->msg = Yii::t("default", "okay");
+                return;
+            }
+
+        }
 			
 	} /*END AjaxAdmin*/			
 }/* END CLASS*/

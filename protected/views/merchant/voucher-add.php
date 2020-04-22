@@ -32,9 +32,9 @@ if (isset($_GET['id'])){
 }
 ?>                                 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Voucher name")?></label>
-  <?php echo CHtml::textField('voucher_name',$data['voucher_name'],array('data-validation'=>'required'))?>
+  <?php echo CHtml::textField('voucher_name',$data['voucher_name'],array('class'=>"uk-input",'data-validation'=>'required'))?>
 </div>
 
 <?php if ($has_already_used):?>
@@ -44,21 +44,22 @@ if (isset($_GET['id'])){
 
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Type")?></label>  
   <?php
 echo CHtml::dropDownList('voucher_type',$data['voucher_type'],
 Yii::app()->functions->voucherType(),array(
-  'data-validation'=>"required"
+  'data-validation'=>"required",
+  'class'=>"uk-select"
 ))
 ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Discount")?></label>  
   <?php echo CHtml::textField('amount',
   normalPrettyPrice($data['amount'])
-  ,array('data-validation'=>'required','class'=>'numeric_only'))?>
+  ,array('data-validation'=>'required','class'=>'numeric_only uk-input'))?>
   <span class="uk-text-muted"><?php echo Yii::t("default","Voucher amount discount.")?></span>
 </div>
 
@@ -68,14 +69,14 @@ Yii::app()->functions->voucherType(),array(
   echo CHtml::hiddenField('expiration',$data['expiration']);
   echo CHtml::textField('expiration1',FormatDateTime($data['expiration'],false),
   array(
- 'class'=>'j_date' ,
+ 'class'=>'j_date uk-input' ,
  'data-id'=>'expiration',
  'data-validation'=>"required"
 ))
 ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Used only once")?></label>  
   <?php  
   echo CHtml::checkBox('used_once',
@@ -87,21 +88,21 @@ Yii::app()->functions->voucherType(),array(
 ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label">Status</label>
   <?php echo CHtml::dropDownList('status',
   isset($data['status'])?$data['status']:"",
   (array)statusList(), 
   array(
-  'class'=>'uk-form-width-large',
+  'class'=>'uk-form-width-large uk-select',
   'data-validation'=>"required"
   ))?>
 </div>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

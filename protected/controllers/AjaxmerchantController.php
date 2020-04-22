@@ -322,6 +322,124 @@ class AjaxmerchantController extends CController
 		} else $this->msg=t("No results");
 		$this->jsonResponse();
 	}
+
+	/*@sbohon start*/
+    public function actionchartReports(){
+        $data='';
+        if ( $data=Driver::generateReports($this->data['chart_type'], $this->data['time_selection'],
+            $this->data['team_selection'], $this->data['driver_selection'],
+            $this->data['chart_type_option'],
+            $this->data['start_date'],
+            $this->data['end_date']
+        )){
+        }
+
+        //dump($data); die();
+        $new_data=null;
+
+        if (is_array($data) && count($data)>=1){
+
+            $first_date=date("Y-m-d",strtotime($data[0]['delivery_date']."-1 day"));
+            $new_data[]=array(
+                'date'=>$first_date,
+                'successful'=>0,
+                'cancelled'=>0,
+                'failed'=>0
+            );
+
+            foreach ($data as $val) {
+                //dump($val);
+                switch ($val['status']) {
+
+                    case "successful":
+                        $new_data[]=array(
+                            'date'=>$val['delivery_date'],
+                            'successful'=>$val['total'],
+                            'driver_name'=>isset($val['driver_name'])?$val['driver_name']:'',
+                            'total_order_amount'=>isset($val['total_order_amount'])?$val['total_order_amount']:'',
+                        );
+                        break;
+
+                    case "cancelled":
+                        $new_data[]=array(
+                            'date'=>$val['delivery_date'],
+                            'cancelled'=>$val['total'],
+                            'driver_name'=>isset($val['driver_name'])?$val['driver_name']:'',
+                            'total_order_amount'=>isset($val['total_order_amount'])?$val['total_order_amount']:'',
+                        );
+                        break;
+
+                    case "failed":
+                        $new_data[]=array(
+                            'date'=>$val['delivery_date'],
+                            'failed'=>$val['total'],
+                            'driver_name'=>isset($val['driver_name'])?$val['driver_name']:'',
+                            'total_order_amount'=>isset($val['total_order_amount'])?$val['total_order_amount']:'',
+                        );
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        } else {
+            /*$new_data[]=array(
+              'date'=>date("Y-m-d"),
+              'failed'=>0,
+              'driver_name'=>''
+            );*/
+        }
+
+        $table='';
+
+
+        if ( $this->data['chart_type_option']=="agent"){
+
+            ob_start();
+            require_once('charts-bar.php');
+            $charts = ob_get_contents();
+            ob_end_clean();
+
+            ob_start();
+            require_once('chart-bar-table.php');
+            $table = ob_get_contents();
+            ob_end_clean();
+
+        } else {
+            ob_start();
+            require_once('protected/modules/driver/models/charts.php');
+            $charts = ob_get_contents();
+            ob_end_clean();
+
+            ob_start();
+            require_once('protected/modules/driver/models/chart-table.php');
+            $table = ob_get_contents();
+            ob_end_clean();
+        }
+        $this->code=1;
+        $this->msg="OK";
+        $this->details=array(
+            'charts'=>$charts,
+            'table'=>$table
+        );
+        $this->jsonResponse();
+    }
+    
+    /**
+     * Get Order details for creating order from merchant panel
+     * url@createorder
+     */
+    public function actionGetProductDataMerchant(){
+        if(!is_numeric($this->data['id_item'])){
+            $this->msg=t("Failed. item id is invalid");
+            return ;
+        }
+        if($food_info=Yii::app()->functions->getFoodItem($this->data['id_item'])){
+            dump($food_info);die();
+        }
+
+    }
+    /*sobhon end*/
 	
 	public function actionDeleteReviewReply()
 	{		

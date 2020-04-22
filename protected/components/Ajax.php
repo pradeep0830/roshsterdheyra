@@ -2729,6 +2729,67 @@ $this->msg=t("We have sent bank information instruction to your email")." :$merc
 		} else $this->msg=$Validator->getErrorAsHTML();	
 	}
 	
+	public function driverAdd()
+	{		
+		
+	   $p = new CHtmlPurifier();
+	   
+	//    $admin_id=Yii::app()->functions->getAdminId(); 
+	   $Validator=new Validator;
+		$req=array(
+		  'first_name'=>Yii::t("default","First name is required"),
+		);		
+		$Validator->required($req,$this->data);
+		if ($Validator->validate()){
+			$params=array(
+				'first_name'=>isset($this->data['first_name'])?$this->data['first_name']:'',
+				'last_name'=>isset($this->data['last_name'])?$this->data['last_name']:'',
+				'email'=>isset($this->data['email'])?$this->data['email']:'',
+				'phone'=>isset($this->data['phone'])?$this->data['phone']:'',
+				'username'=>isset($this->data['username'])?$this->data['username']:'',
+				'password'=>isset($this->data['password'])?md5($this->data['password']):'',
+				'team_id'=>isset($this->data['team_id_driver_new'])?$this->data['team_id_driver_new']:'',
+				'transport_type_id'=>isset($this->data['transport_type_id'])?$this->data['transport_type_id']:'',
+				'transport_description'=>isset($this->data['transport_description'])?$this->data['transport_description']:'',
+				'licence_plate'=>isset($this->data['licence_plate'])?$this->data['licence_plate']:'',
+				'color'=>isset($this->data['color'])?$this->data['color']:'',
+				'status'=>isset($this->data['status'])?$this->data['status']:'',
+				'date_created'=>FunctionsV3::dateNow(),
+				'ip_address'=>$_SERVER['REMOTE_ADDR'],
+				'profile_photo'=>isset($this->data['profile_photo'])?$this->data['profile_photo']:''
+			);			
+		   if (empty($this->data['id'])){	
+		    	if ( $this->insertData("{{driver}}",$params)){
+		    		    $this->details=Yii::app()->db->getLastInsertID();
+			    		$this->code=1;
+			    		$this->msg=Yii::t("default","Successful");				    		
+			    	}
+			    } else {		    	
+			    	unset($params['date_created']);
+					$params['date_modified']=FunctionsV3::dateNow();
+					
+					$filename_to_delete='';
+					if($old_data=Yii::app()->functions->GetDriver($this->data['id'])){
+						if($old_data['profile_photo']!=$this->data['profile_photo']){
+						   $filename_to_delete=$old_data['profile_photo'];			
+						}			
+					}
+					
+					$res = $this->updateData('{{driver}}' , $params ,'driver_id',$this->data['id']);
+					if ($res){
+						$this->code=1;
+		                $this->msg=Yii::t("default",'Driver updated');  
+		                
+		                /*DELETE IMAGE*/
+		                if(!empty($filename_to_delete)){
+		                  FunctionsV3::deleteUploadedFile($filename_to_delete);
+		                }
+					    
+				} else $this->msg=Yii::t("default","ERROR: cannot update");
+		    }	
+		} else $this->msg=$Validator->getErrorAsHTML();	
+	}
+
 	public function addVoucherNew()
 	{					
 		$functionsk=new FunctionsK();		

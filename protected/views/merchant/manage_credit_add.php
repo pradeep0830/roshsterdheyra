@@ -18,19 +18,19 @@ if(isset($data['mt_id'])){
 ?>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Card name")?></label>
   <?php
   echo CHtml::textField('card_name',
   isset($data['card_name'])?$data['card_name']:''
   ,array(
-   'class'=>'uk-form-width-large',
+   'class'=>'uk-form-width-large uk-input',
    'data-validation'=>"required"  
   ));
   ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo t("Credit Card Number")?></label>
   <?php  
   $decryp_card = isset($data['credit_card_number'])?$data['credit_card_number']:'';
@@ -47,62 +47,62 @@ if(isset($data['mt_id'])){
   echo CHtml::textField('credit_card_number',
   $decryp_card
   ,array(
-   'class'=>'uk-form-width-large numeric_only',
+   'class'=>'uk-form-width-large numeric_only uk-input',
    'data-validation'=>"required" ,
    'maxlength'=>16
   ));
   ?>
 </div>
 
-<div class="uk-form-row">                  
+<div class="uk-form-row uk-margin">                  
   <label class="uk-form-label"><?php echo t("Exp. month")?></label>
       <?php echo CHtml::dropDownList('expiration_month',
       isset($data['expiration_month'])?$data['expiration_month']:''
       ,
       Yii::app()->functions->ccExpirationMonth()
       ,array(
-       'class'=>'uk-form-width-large',   
+       'class'=>'uk-form-width-large uk-select',   
        'data-validation'=>"required"  
       ))?>
 </div>       
 
 
-<div class="uk-form-row">                  
+<div class="uk-form-row uk-margin">                  
   <label class="uk-form-label"><?php echo t("Exp. year")?></label>
       <?php echo CHtml::dropDownList('expiration_yr',
       isset($data['expiration_yr'])?$data['expiration_yr']:''
       ,
       Yii::app()->functions->ccExpirationYear()
       ,array(
-       'class'=>'uk-form-width-large',   
+       'class'=>'uk-form-width-large uk-select',   
        'data-validation'=>"required"  
       ))?>
 </div>    
 
- <div class="uk-form-row">      
+ <div class="uk-form-row uk-margin">      
  <label class="uk-form-label"><?php echo t("CVV")?></label>            
       <?php echo CHtml::textField('cvv',
       isset($data['cvv'])?$data['cvv']:''
       ,array(
-       'class'=>'uk-form-width-large numeric_only',     
+       'class'=>'uk-form-width-large numeric_only uk-input',     
        'data-validation'=>"required",
        'maxlength'=>4
       ))?>
    </div>             
    
-   <div class="uk-form-row">                     
+   <div class="uk-form-row uk-margin">                     
    <label class="uk-form-label"><?php echo t("Billing Address")?></label>            
       <?php echo CHtml::textField('billing_address',
       isset($data['billing_address'])?$data['billing_address']:''
       ,array(
-       'class'=>'uk-form-width-large',          
+       'class'=>'uk-form-width-large uk-input',          
        'data-validation'=>"required"  
       ))?>
    </div>            
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

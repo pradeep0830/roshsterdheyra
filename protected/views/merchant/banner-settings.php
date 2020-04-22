@@ -3,7 +3,7 @@
 <?php echo CHtml::hiddenField('action','BannerSettings')?>
 
 
-<div class="uk-form-row"> 
+<div class="uk-form-row uk-margin"> 
  <label class="uk-form-label"><?php echo Yii::t('default',"Enabled")?></label>
  <?php 
  echo CHtml::checkBox('banner_enabled',
@@ -16,10 +16,10 @@
 </div>
 
 <!--GALLERY -->
-<div class="uk-form-row"> 
+<div class="uk-form-row uk-margin"> 
   <label class="uk-form-label"><?php echo t("Gallery Image")?></label>
   <a href="javascript:;" id="multiple_upload" 
-   class="button uk-button" data-progress="multiple_upload_progress" data-preview="image_multiple_preview" data-field="photo">
+   class="button uk-button uk-button-default" data-progress="multiple_upload_progress" data-preview="image_multiple_preview" data-field="photo">
     <?php echo t("Browse")?>
   </a>
 </div>
@@ -49,9 +49,9 @@
 
 <div class="spacer"></div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

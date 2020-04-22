@@ -8,37 +8,37 @@ $google_page=Yii::app()->functions->getOption("google_page",$merchant_id);
 <form class="uk-form uk-form-horizontal forms" id="forms">
 <?php echo CHtml::hiddenField('action','socialSettings')?>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Facebook Page")?></label>
   <?php   
   echo CHtml::textField('facebook_page',$facebook_page,array(
-       'class'=>'uk-form-width-large',
+       'class'=>'uk-form-width-large uk-input',
   ))
   ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Twitter Page")?></label>
   <?php   
   echo CHtml::textField('twitter_page',$twitter_page,array(
-       'class'=>'uk-form-width-large',
+       'class'=>'uk-form-width-large uk-input',
   ))
   ?>
 </div>
 
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
   <label class="uk-form-label"><?php echo Yii::t("default","Google Page")?></label>
   <?php   
   echo CHtml::textField('google_page',$google_page,array(
-       'class'=>'uk-form-width-large',
+       'class'=>'uk-form-width-large uk-input',
   ))
   ?>
 </div>
 
-<div class="uk-form-row">
+<div class="uk-form-row uk-margin">
 <label class="uk-form-label"></label>
-<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-success">
+<input type="submit" value="<?php echo Yii::t("default","Save")?>" class="uk-button uk-form-width-medium uk-button-primary">
 </div>
 
 </form>

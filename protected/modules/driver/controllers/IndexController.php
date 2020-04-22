@@ -28,7 +28,7 @@ class IndexController extends CController
 		}*/
 		
 		$action_name= $action->id ;
-		$accept_controller=array('login','ajax','setlanguage');
+		$accept_controller=array('login','ajax','setlanguage','driverchat');
 		if(!Driver::islogin()){			
 			if(!in_array($action_name,$accept_controller)){
 				$this->redirect(Yii::app()->createUrl('/driver/index/login'));
@@ -143,7 +143,62 @@ class IndexController extends CController
 		
 		return true;				
 	}
-	
+	public function actionDriverChat(){
+	    $store_token="63fa39be8992ffcb4984f3641c2665c8";
+	    $device_id_store="djEKRZmYpTU:APA91bGRoqSMyNZ2gEaDC5d-h5oNKe7d-nFYT6xtKN2Fsudm_vfxeOm0veTZkSerpkx4vKXQtToGO5LocrjU_FgqSZhdX0IFBqkXGLw6qkyH828MWOtXSKKD2GnsHRRRKqi31c1cJse0djEKRZmYpTU:APA91bGRoqSMyNZ2gEaDC5d-h5oNKe7d-nFYT6xtKN2Fsudm_vfxeOm0veTZkSerpkx4vKXQtToGO5LocrjU_FgqSZhdX0IFBqkXGLw6qkyH828MWOtXSKKD2GnsHRRRKqi31c1cJse0";
+	    $token=$_REQUEST['token'];
+	    $device_id=$_REQUEST['device_id'];
+        $order_id=$_REQUEST['order_id'];
+        $client_id=$_REQUEST['client_id'];
+        $driver_id=$_REQUEST['driver_id'];
+        $db_ext=new DbExt;
+        $client_stmnt="SELECT concat(first_name,' ', last_name) as full_name,email_address,contact_phone,avatar,token
+        FROM {{client}}
+        WHERE
+        client_id= ".FunctionsV3::q($client_id)."
+		LIMIT 0,1
+        ";
+        if(is_array($db_ext->rst($client_stmnt))){
+            $client_data=$db_ext->rst($client_stmnt);
+        }
+        else{
+            die("no data");
+        }
+        $stmt="SELECT *
+		FROM
+		{{chat}}
+		WHERE		
+		
+		sender_userid = ".FunctionsV3::q($driver_id)."
+		AND
+		reciever_userid =".$client_id."
+		OR
+		sender_userid = ".$client_id." AND reciever_userid =".FunctionsV3::q($driver_id)."
+		AND
+		order_id=".$order_id."	
+		
+		ORDER BY timestamp ASC
+		";
+        ///dump($db_ext->rst($stmt));die();
+        $res=null;
+        if ($db_ext->rst($stmt)){
+            $res=$db_ext->rst($stmt);
+        }
+        else{
+            $res="no_data";
+        }
+        $cs = Yii::app()->getClientScript();
+        $baseUrl = Yii::app()->baseUrl;
+        $cs->registerScriptFile($baseUrl."/assets/js/scrolbar.js",CClientScript::POS_END);
+        $cs->registerScriptFile($baseUrl."/assets/js/driver.chat.js",CClientScript::POS_END);
+        $cs->registerCssFile($baseUrl."/assets/css/store.css");
+        //if ($store_token==$token && $device_id_store==$device_id){
+        if ($store_token==$token){
+            $this->render('chat-front',array('data'=>$res,'client_d'=>$client_data));
+        } else $this->render('404-page',array(
+            'header'=>true
+        ));
+    }
 	public function actionLogin()
 	{
 		$this->body_class='login-body';
